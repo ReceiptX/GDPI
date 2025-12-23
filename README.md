@@ -29,7 +29,7 @@ GDPI is a multi-tenant SaaS platform for Arizona HOAs and homeowners that uses A
 
 - **Frontend**: React Native with Expo (cross-platform iOS/Android)
 - **Navigation**: React Navigation (native stack)
-- **AI**: OpenAI GPT-4 (configurable via environment variables)
+- **AI**: Groq API with Llama 3.1 70B (free tier: 14,400 requests/day)
 - **Storage**: AsyncStorage for local persistence
 - **Observability**: OpenTelemetry (OTLP traces)
 - **Language**: TypeScript
@@ -64,13 +64,15 @@ Create a `.env` file based on `.env.example`:
 cp .env.example .env
 ```
 
-Edit `.env` and add your OpenAI API key:
+Edit `.env` and add your Groq API key:
 
 ```
-OPENAI_API_KEY=sk-your-actual-openai-api-key-here
+GROQ_API_KEY=gsk_your-actual-groq-api-key-here
 APP_ROLE_DEFAULT=homeowner
 OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318/v1/traces
 ```
+
+**Get your free Groq API key**: Visit [console.groq.com](https://console.groq.com) to sign up and get 14,400 free requests per day.
 
 **Important**: Never commit your `.env` file. It's already in `.gitignore`.
 

@@ -29,7 +29,7 @@
       "favicon": "./assets/favicon.png"
     },
     "extra": {
-      "openaiApiKey": "${OPENAI_API_KEY}",
+      "groqApiKey": "${GROQ_API_KEY}",
       "otlpEndpoint": "${OTEL_EXPORTER_OTLP_ENDPOINT}"
     }
   }

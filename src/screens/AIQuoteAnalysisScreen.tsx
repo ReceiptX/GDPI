@@ -53,7 +53,8 @@ export default function AIQuoteAnalysisScreen({
 
     try {
       // Get API key from configuration (production-ready with expo-constants)
-      const apiKey = config.openaiApiKey;
+      // Using Groq API with free tier (14,400 requests/day)
+      const apiKey = config.groqApiKey;
       const aiService = new AIService(apiKey);
 
       await telemetry.traceOperation(

@@ -25,7 +25,7 @@ export class AIService {
     timing: JobTiming,
     doorSetup: string
   ): Promise<AIAnalysisResult> {
-    if (!this.apiKey || this.apiKey === 'your_openai_api_key_here') {
+    if (!this.apiKey || this.apiKey === 'your_groq_api_key_here') {
       // Return mock analysis if no API key
       return this.getMockAnalysis(quoteText, timing);
     }
@@ -33,14 +33,16 @@ export class AIService {
     try {
       const prompt = this.buildAnalysisPrompt(quoteText, timing, doorSetup);
       
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      // Using Groq API with Llama 3.1 70B model
+      // Free tier: 14,400 requests/day with ultra-fast inference
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${this.apiKey}`,
         },
         body: JSON.stringify({
-          model: 'gpt-4',
+          model: 'llama-3.1-70b-versatile',
           messages: [
             {
               role: 'system',
@@ -57,7 +59,7 @@ export class AIService {
       });
 
       if (!response.ok) {
-        throw new Error(`OpenAI API error: ${response.status}`);
+        throw new Error(`Groq API error: ${response.status}`);
       }
 
       const data = await response.json();
