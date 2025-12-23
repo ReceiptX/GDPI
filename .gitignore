@@ -49,5 +49,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 
+# VS Code - local user settings
+.vscode/settings.local.json
+.vscode/.ropeproject
+
 # Temporary files
 /tmp/
