@@ -1,0 +1,2 @@
+# This is a placeholder for adaptive-icon.png (Android)
+# In production, replace with a 1024x1024 PNG with transparent background

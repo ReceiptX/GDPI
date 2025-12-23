@@ -31,6 +31,7 @@ interface AppNavigatorProps {
 
 export default function AppNavigator({ user, onLogin, onLogout }: AppNavigatorProps) {
   const linking = {
+    prefixes: [],
     config: {
       screens: {
         Login: 'login',
