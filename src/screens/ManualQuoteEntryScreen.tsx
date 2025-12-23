@@ -15,6 +15,7 @@ import { User, JobTiming, Quote, ManualQuoteEntry as ManualEntry } from '../type
 import { AIService } from '../services/ai';
 import { StorageService } from '../services/storage';
 import { telemetry } from '../services/telemetry';
+import config from '../utils/config';
 
 type ManualQuoteEntryScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -76,8 +77,8 @@ export default function ManualQuoteEntryScreen({
       // Build quote text from manual entry
       const quoteText = buildQuoteText();
       
-      // Get API key - in production, use expo-constants or secure config
-      const apiKey = 'your_openai_api_key_here'; // Replace with secure config
+      // Get API key from configuration (production-ready)
+      const apiKey = config.openaiApiKey;
       const aiService = new AIService(apiKey);
 
       await telemetry.traceOperation(

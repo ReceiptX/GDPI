@@ -11,9 +11,11 @@ import AIQuoteAnalysisScreen from '../screens/AIQuoteAnalysisScreen';
 import ManualQuoteEntryScreen from '../screens/ManualQuoteEntryScreen';
 import NeighborhoodPricingScreen from '../screens/NeighborhoodPricingScreen';
 import AdminRosterScreen from '../screens/AdminRosterScreen';
+import HOARegistrationScreen from '../screens/HOARegistrationScreen';
 
 export type RootStackParamList = {
   Login: undefined;
+  HOARegistration: undefined;
   Home: undefined;
   AIQuoteAnalysis: undefined;
   ManualQuoteEntry: undefined;
@@ -30,11 +32,14 @@ interface AppNavigatorProps {
 }
 
 export default function AppNavigator({ user, onLogin, onLogout }: AppNavigatorProps) {
+  const [showRegistration, setShowRegistration] = React.useState(false);
+
   const linking = {
     prefixes: [],
     config: {
       screens: {
         Login: 'login',
+        HOARegistration: 'register',
         Home: 'home',
         AIQuoteAnalysis: 'ai-analysis',
         ManualQuoteEntry: 'manual-entry',
@@ -67,12 +72,34 @@ export default function AppNavigator({ user, onLogin, onLogout }: AppNavigatorPr
         }}
       >
         {!user ? (
-          <Stack.Screen
-            name="Login"
-            options={{ title: 'GDPI Login', headerShown: false }}
-          >
-            {(props) => <LoginScreen {...props} onLogin={onLogin || (() => {})} />}
-          </Stack.Screen>
+          <>
+            {!showRegistration ? (
+              <Stack.Screen
+                name="Login"
+                options={{ title: 'GDPI Login', headerShown: false }}
+              >
+                {(props) => (
+                  <LoginScreen 
+                    {...props} 
+                    onLogin={onLogin || (() => {})} 
+                    onRegister={() => setShowRegistration(true)}
+                  />
+                )}
+              </Stack.Screen>
+            ) : (
+              <Stack.Screen
+                name="HOARegistration"
+                options={{ title: 'Register HOA', headerShown: false }}
+              >
+                {(props) => (
+                  <HOARegistrationScreen 
+                    {...props} 
+                    onRegistrationComplete={() => setShowRegistration(false)}
+                  />
+                )}
+              </Stack.Screen>
+            )}
+          </>
         ) : (
           <>
             <Stack.Screen

@@ -15,6 +15,7 @@ import { User, JobTiming, Quote, QuoteVerdict } from '../types';
 import { AIService } from '../services/ai';
 import { StorageService } from '../services/storage';
 import { telemetry } from '../services/telemetry';
+import config from '../utils/config';
 
 type AIQuoteAnalysisScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -51,10 +52,8 @@ export default function AIQuoteAnalysisScreen({
     setResult(null);
 
     try {
-      // Get API key from environment
-      // Note: In React Native, environment variables need special handling
-      // For MVP, using placeholder. In production, use expo-constants or secure config
-      const apiKey = 'your_openai_api_key_here'; // Replace with secure config in production
+      // Get API key from configuration (production-ready with expo-constants)
+      const apiKey = config.openaiApiKey;
       const aiService = new AIService(apiKey);
 
       await telemetry.traceOperation(

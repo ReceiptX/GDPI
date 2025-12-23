@@ -14,9 +14,10 @@ import { telemetry } from '../services/telemetry';
 
 interface LoginScreenProps {
   onLogin: (user: any) => void;
+  onRegister?: () => void;
 }
 
-export default function LoginScreen({ onLogin }: LoginScreenProps) {
+export default function LoginScreen({ onLogin, onRegister }: LoginScreenProps) {
   const [hoaId, setHoaId] = useState('');
   const [email, setEmail] = useState('');
   const [pin, setPin] = useState('');
@@ -38,8 +39,35 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
           const user = await StorageService.authenticateUser(hoaId, email, pin);
 
           if (user) {
-            await StorageService.setCurrentUser(user);
-            onLogin(user);
+            // Check subscription status
+            const subscription = await StorageService.checkSubscription(hoaId);
+            
+            if (!subscription.active) {
+              Alert.alert(
+                'Subscription Required',
+                subscription.tier === 'trial_expired' 
+                  ? 'Your trial has expired. Please upgrade to continue using GDPI.'
+                  : 'This HOA does not have an active subscription. Please contact your administrator.',
+                [{ text: 'OK' }]
+              );
+              setLoading(false);
+              return;
+            }
+
+            // Show trial warning if less than 3 days remaining
+            if (subscription.tier === 'trial' && subscription.daysRemaining && subscription.daysRemaining <= 3) {
+              Alert.alert(
+                'Trial Ending Soon',
+                `Your trial expires in ${subscription.daysRemaining} days. Upgrade to continue using GDPI.`,
+                [{ text: 'OK', onPress: () => {
+                  StorageService.setCurrentUser(user);
+                  onLogin(user);
+                }}]
+              );
+            } else {
+              await StorageService.setCurrentUser(user);
+              onLogin(user);
+            }
           } else {
             Alert.alert(
               'Login Failed',
@@ -115,6 +143,14 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
         <Text style={styles.footer}>
           Arizona HOAs only • No PII collected • Licensed vendors recommended
         </Text>
+
+        {onRegister && (
+          <TouchableOpacity style={styles.registerLink} onPress={onRegister}>
+            <Text style={styles.registerLinkText}>
+              Don't have an account? Register your HOA
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     </KeyboardAvoidingView>
   );
@@ -194,5 +230,15 @@ const styles = StyleSheet.create({
     color: '#9ca3af',
     textAlign: 'center',
     marginTop: 24,
+  },
+  registerLink: {
+    marginTop: 16,
+    padding: 12,
+    alignItems: 'center',
+  },
+  registerLinkText: {
+    fontSize: 14,
+    color: '#2563eb',
+    fontWeight: '600',
   },
 });

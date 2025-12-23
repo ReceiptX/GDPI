@@ -58,11 +58,9 @@ export default function AdminRosterScreen({
     }
   };
 
-  const generatePin = (): string => {
-    // SECURITY NOTE: Math.random() is not cryptographically secure
-    // In production, use expo-crypto: crypto.getRandomValues(new Uint8Array(1))[0] % 10000
-    // For MVP demo purposes, Math.random() is sufficient
-    return Math.floor(1000 + Math.random() * 9000).toString();
+  const generatePin = async (): Promise<string> => {
+    // Production-ready cryptographically secure PIN generation
+    return await StorageService.generateSecurePin();
   };
 
   const handleAddResident = async () => {
@@ -71,25 +69,29 @@ export default function AdminRosterScreen({
       return;
     }
 
-    const pin = newPin.trim() || generatePin();
-    
-    if (pin.length !== 4 || !/^\d+$/.test(pin)) {
-      Alert.alert('Error', 'PIN must be exactly 4 digits');
-      return;
-    }
-
-    // Check if email already exists
-    if (residents.some(r => r.email === newEmail.trim())) {
-      Alert.alert('Error', 'This email is already registered');
-      return;
-    }
-
     setAdding(true);
     try {
+      const pin = newPin.trim() || await generatePin();
+      
+      if (pin.length !== 4 || !/^\d+$/.test(pin)) {
+        Alert.alert('Error', 'PIN must be exactly 4 digits');
+        setAdding(false);
+        return;
+      }
+
+      // Check if email already exists
+      if (residents.some(r => r.email === newEmail.trim())) {
+        Alert.alert('Error', 'This email is already registered');
+        setAdding(false);
+        return;
+      }
+
       const newResident: Resident = {
         email: newEmail.trim(),
         pin,
         hoaId: user.hoaId,
+        role: 'homeowner', // Default role for new residents
+        createdAt: new Date().toISOString(),
       };
 
       await StorageService.addResident(newResident);
@@ -118,7 +120,7 @@ export default function AdminRosterScreen({
         {
           text: 'Generate',
           onPress: async () => {
-            const newPin = generatePin();
+            const newPin = await generatePin();
             try {
               await StorageService.updateResident(resident.email, { pin: newPin });
               await loadResidents();

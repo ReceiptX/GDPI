@@ -17,6 +17,8 @@ export interface Resident {
   email: string;
   pin: string;
   hoaId: string;
+  role: UserRole; // Explicit role field for production security
+  createdAt?: string;
 }
 
 export interface Quote {
@@ -31,11 +33,16 @@ export interface Quote {
   notes: string;
 }
 
+export type SubscriptionTier = 'trial' | 'basic' | 'premium';
+
 export interface AppData {
   hoaId: string;
   residents: Resident[];
   quoteHistory: Quote[];
-  subscribed?: boolean;
+  subscribed: boolean;
+  subscriptionTier: SubscriptionTier;
+  subscriptionExpiresAt?: string; // ISO date string
+  trialStartedAt?: string; // ISO date string
 }
 
 export interface AIAnalysisResult {
@@ -73,4 +80,14 @@ export interface BaselinePricing {
   doubleDoor: [number, number];
   torsionConversion: [number, number];
   afterHoursMultiplier: [number, number];
+}
+
+export interface HOARegistration {
+  hoaId: string;
+  hoaName: string;
+  adminEmail: string;
+  adminName: string;
+  billingEmail?: string;
+  subscriptionTier: SubscriptionTier;
+  trialDays?: number; // Default 14 days
 }

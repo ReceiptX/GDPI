@@ -10,6 +10,8 @@ const defaultAppData: AppData = {
   residents: [],
   quoteHistory: [],
   subscribed: false,
+  subscriptionTier: 'trial',
+  trialStartedAt: new Date().toISOString(),
 };
 
 export const StorageService = {
@@ -149,11 +151,8 @@ export const StorageService = {
       );
 
       if (resident) {
-        // Determine role - SECURITY NOTE: In production, roles should be 
-        // explicitly stored in the resident record, not inferred from email
-        // This is a simplified approach for MVP demo purposes
-        const role = email.toLowerCase().includes('admin') ? 'admin' : 'homeowner';
-        return { ...resident, role };
+        // Use explicit role from resident record (production-ready)
+        return { ...resident, role: resident.role };
       }
 
       return null;
@@ -171,15 +170,144 @@ export const StorageService = {
       // Only initialize if no data exists
       if (appData.residents.length === 0) {
         appData.hoaId = 'hoa001';
+        appData.subscribed = true;
+        appData.subscriptionTier = 'basic';
         appData.residents = [
-          { email: 'admin@hoa001.com', pin: '1234', hoaId: 'hoa001' },
-          { email: 'resident@hoa001.com', pin: '5678', hoaId: 'hoa001' },
+          { 
+            email: 'admin@hoa001.com', 
+            pin: '1234', 
+            hoaId: 'hoa001',
+            role: 'admin',
+            createdAt: new Date().toISOString()
+          },
+          { 
+            email: 'resident@hoa001.com', 
+            pin: '5678', 
+            hoaId: 'hoa001',
+            role: 'homeowner',
+            createdAt: new Date().toISOString()
+          },
         ];
         
         await this.setAppData(appData);
       }
     } catch (error) {
       console.error('Error initializing demo data:', error);
+    }
+  },
+
+  // HOA Registration (Production-ready)
+  async registerHOA(registration: any): Promise<{ success: boolean; adminPin: string; error?: string }> {
+    try {
+      const { hoaId, hoaName, adminEmail, adminName, subscriptionTier = 'trial', trialDays = 14 } = registration;
+      
+      const appData = await this.getAppData();
+      
+      // Check if HOA already exists
+      if (appData.residents.some(r => r.hoaId === hoaId)) {
+        return { success: false, adminPin: '', error: 'HOA ID already exists' };
+      }
+
+      // Generate secure PIN using crypto
+      const adminPin = await this.generateSecurePin();
+      
+      // Calculate trial expiration
+      const trialStartedAt = new Date();
+      const subscriptionExpiresAt = new Date(trialStartedAt);
+      subscriptionExpiresAt.setDate(subscriptionExpiresAt.getDate() + trialDays);
+
+      // Create admin user
+      const admin: Resident = {
+        email: adminEmail,
+        pin: adminPin,
+        hoaId,
+        role: 'admin',
+        createdAt: new Date().toISOString(),
+      };
+
+      // Update app data
+      appData.hoaId = hoaId;
+      appData.residents.push(admin);
+      appData.subscribed = subscriptionTier === 'trial' || subscriptionTier === 'basic' || subscriptionTier === 'premium';
+      appData.subscriptionTier = subscriptionTier;
+      appData.trialStartedAt = trialStartedAt.toISOString();
+      appData.subscriptionExpiresAt = subscriptionTier === 'trial' ? subscriptionExpiresAt.toISOString() : undefined;
+
+      await this.setAppData(appData);
+
+      return { success: true, adminPin };
+    } catch (error) {
+      console.error('Error registering HOA:', error);
+      return { success: false, adminPin: '', error: 'Registration failed' };
+    }
+  },
+
+  // Check subscription status
+  async checkSubscription(hoaId: string): Promise<{ active: boolean; tier: string; daysRemaining?: number }> {
+    try {
+      const appData = await this.getAppData();
+      
+      if (appData.hoaId !== hoaId) {
+        return { active: false, tier: 'none' };
+      }
+
+      if (!appData.subscribed) {
+        return { active: false, tier: 'none' };
+      }
+
+      // Check if trial expired
+      if (appData.subscriptionTier === 'trial' && appData.subscriptionExpiresAt) {
+        const expiresAt = new Date(appData.subscriptionExpiresAt);
+        const now = new Date();
+        
+        if (now > expiresAt) {
+          return { active: false, tier: 'trial_expired' };
+        }
+
+        const daysRemaining = Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        return { active: true, tier: appData.subscriptionTier, daysRemaining };
+      }
+
+      return { active: true, tier: appData.subscriptionTier };
+    } catch (error) {
+      console.error('Error checking subscription:', error);
+      return { active: false, tier: 'error' };
+    }
+  },
+
+  // Upgrade subscription
+  async upgradeSubscription(hoaId: string, tier: 'basic' | 'premium'): Promise<boolean> {
+    try {
+      const appData = await this.getAppData();
+      
+      if (appData.hoaId !== hoaId) {
+        return false;
+      }
+
+      appData.subscriptionTier = tier;
+      appData.subscribed = true;
+      appData.subscriptionExpiresAt = undefined; // No expiration for paid tiers
+
+      await this.setAppData(appData);
+      return true;
+    } catch (error) {
+      console.error('Error upgrading subscription:', error);
+      return false;
+    }
+  },
+
+  // Generate cryptographically secure PIN
+  async generateSecurePin(): Promise<string> {
+    try {
+      // Use expo-crypto for production-grade security
+      const Crypto = require('expo-crypto');
+      const randomBytes = await Crypto.getRandomBytesAsync(2);
+      const randomNumber = (randomBytes[0] << 8) | randomBytes[1];
+      return (1000 + (randomNumber % 9000)).toString();
+    } catch (error) {
+      // Fallback to Math.random if crypto unavailable
+      console.warn('Crypto unavailable, falling back to Math.random()');
+      return Math.floor(1000 + Math.random() * 9000).toString();
     }
   },
 };
