@@ -3,7 +3,7 @@
 export const PRICING_CONFIG = {
   STANDARD_PRICE_PER_HOMEOWNER: 3.00,
   BULK_PRICE_PER_HOMEOWNER: 1.50,
-  BULK_DISCOUNT_THRESHOLD: 50, // Bulk pricing kicks in at 50+ homeowners
+  BULK_DISCOUNT_THRESHOLD: 500, // Bulk pricing kicks in at 500+ homeowners
 };
 
 /**
@@ -11,7 +11,7 @@ export const PRICING_CONFIG = {
  * 
  * Pricing model:
  * - $3.00 per homeowner per month (standard rate)
- * - $1.50 per homeowner per month (bulk rate for 50+ homeowners)
+ * - $1.50 per homeowner per month (bulk rate for 500+ homeowners)
  * 
  * @param homeownerCount Number of homeowners in the HOA
  * @returns Pricing information including total, per-homeowner rate, and bulk discount status

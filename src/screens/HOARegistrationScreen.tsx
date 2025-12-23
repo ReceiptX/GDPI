@@ -255,7 +255,7 @@ export default function HOARegistrationScreen({ onRegistrationComplete }: HOAReg
               • Standard: $3.00/homeowner/month
             </Text>
             <Text style={styles.pricingInfoText}>
-              • Bulk (50+ homeowners): $1.50/homeowner/month
+              • Bulk (500+ homeowners): $1.50/homeowner/month
             </Text>
             <Text style={styles.pricingInfoNote}>
               The more homeowners in your HOA, the better the rate!
