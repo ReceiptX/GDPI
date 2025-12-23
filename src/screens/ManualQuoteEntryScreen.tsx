@@ -76,7 +76,8 @@ export default function ManualQuoteEntryScreen({
       // Build quote text from manual entry
       const quoteText = buildQuoteText();
       
-      const apiKey = process.env.OPENAI_API_KEY || 'your_openai_api_key_here';
+      // Get API key - in production, use expo-constants or secure config
+      const apiKey = 'your_openai_api_key_here'; // Replace with secure config
       const aiService = new AIService(apiKey);
 
       await telemetry.traceOperation(

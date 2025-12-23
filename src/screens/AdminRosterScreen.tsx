@@ -59,6 +59,9 @@ export default function AdminRosterScreen({
   };
 
   const generatePin = (): string => {
+    // SECURITY NOTE: Math.random() is not cryptographically secure
+    // In production, use expo-crypto: crypto.getRandomValues(new Uint8Array(1))[0] % 10000
+    // For MVP demo purposes, Math.random() is sufficient
     return Math.floor(1000 + Math.random() * 9000).toString();
   };
 

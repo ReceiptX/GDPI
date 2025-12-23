@@ -51,8 +51,10 @@ export default function AIQuoteAnalysisScreen({
     setResult(null);
 
     try {
-      // Get API key from environment (in production this would be from .env)
-      const apiKey = process.env.OPENAI_API_KEY || 'your_openai_api_key_here';
+      // Get API key from environment
+      // Note: In React Native, environment variables need special handling
+      // For MVP, using placeholder. In production, use expo-constants or secure config
+      const apiKey = 'your_openai_api_key_here'; // Replace with secure config in production
       const aiService = new AIService(apiKey);
 
       await telemetry.traceOperation(

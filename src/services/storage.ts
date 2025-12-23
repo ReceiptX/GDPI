@@ -111,7 +111,12 @@ export const StorageService = {
       const appData = await this.getAppData();
       const index = appData.residents.findIndex(r => r.email === email);
       if (index !== -1) {
-        appData.residents[index] = { ...appData.residents[index], ...updates };
+        // Use immutable update pattern
+        appData.residents = [
+          ...appData.residents.slice(0, index),
+          { ...appData.residents[index], ...updates },
+          ...appData.residents.slice(index + 1)
+        ];
         await this.setAppData(appData);
       }
     } catch (error) {
@@ -144,7 +149,9 @@ export const StorageService = {
       );
 
       if (resident) {
-        // Determine role - for simplicity, email containing 'admin' is admin
+        // Determine role - SECURITY NOTE: In production, roles should be 
+        // explicitly stored in the resident record, not inferred from email
+        // This is a simplified approach for MVP demo purposes
         const role = email.toLowerCase().includes('admin') ? 'admin' : 'homeowner';
         return { ...resident, role };
       }
