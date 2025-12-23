@@ -33,7 +33,7 @@ export interface Quote {
   notes: string;
 }
 
-export type SubscriptionTier = 'trial' | 'basic' | 'premium';
+export type SubscriptionTier = 'trial' | 'paid';
 
 export interface AppData {
   hoaId: string;
@@ -43,6 +43,7 @@ export interface AppData {
   subscriptionTier: SubscriptionTier;
   subscriptionExpiresAt?: string; // ISO date string
   trialStartedAt?: string; // ISO date string
+  homeownerCount?: number; // Number of homeowners for pricing calculation
 }
 
 export interface AIAnalysisResult {
@@ -90,4 +91,13 @@ export interface HOARegistration {
   billingEmail?: string;
   subscriptionTier: SubscriptionTier;
   trialDays?: number; // Default 14 days
+  homeownerCount: number; // Number of homeowners in HOA for pricing
+}
+
+export interface PricingInfo {
+  homeownerCount: number;
+  pricePerHomeowner: number; // $3.00 or $1.50 with bulk discount
+  monthlyTotal: number;
+  hasBulkDiscount: boolean;
+  discountThreshold: number; // Number of homeowners needed for bulk pricing
 }

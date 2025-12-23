@@ -4,7 +4,7 @@ import { AppData, User, Quote, Resident } from '../types';
 const STORAGE_KEY = 'gdpi_app_data';
 const USER_KEY = 'gdpi_current_user';
 
-// Initialize default app data
+  // Initialize default app data
 const defaultAppData: AppData = {
   hoaId: '',
   residents: [],
@@ -12,6 +12,7 @@ const defaultAppData: AppData = {
   subscribed: false,
   subscriptionTier: 'trial',
   trialStartedAt: new Date().toISOString(),
+  homeownerCount: 0,
 };
 
 export const StorageService = {
@@ -171,7 +172,8 @@ export const StorageService = {
       if (appData.residents.length === 0) {
         appData.hoaId = 'hoa001';
         appData.subscribed = true;
-        appData.subscriptionTier = 'basic';
+        appData.subscriptionTier = 'paid';
+        appData.homeownerCount = 85; // Demo HOA with 85 homeowners
         appData.residents = [
           { 
             email: 'admin@hoa001.com', 
@@ -199,7 +201,7 @@ export const StorageService = {
   // HOA Registration (Production-ready)
   async registerHOA(registration: any): Promise<{ success: boolean; adminPin: string; error?: string }> {
     try {
-      const { hoaId, hoaName, adminEmail, adminName, subscriptionTier = 'trial', trialDays = 14 } = registration;
+      const { hoaId, hoaName, adminEmail, adminName, subscriptionTier = 'trial', trialDays = 14, homeownerCount = 1 } = registration;
       
       const appData = await this.getAppData();
       
@@ -228,10 +230,11 @@ export const StorageService = {
       // Update app data
       appData.hoaId = hoaId;
       appData.residents.push(admin);
-      appData.subscribed = subscriptionTier === 'trial' || subscriptionTier === 'basic' || subscriptionTier === 'premium';
+      appData.subscribed = subscriptionTier === 'trial' || subscriptionTier === 'paid';
       appData.subscriptionTier = subscriptionTier;
       appData.trialStartedAt = trialStartedAt.toISOString();
       appData.subscriptionExpiresAt = subscriptionTier === 'trial' ? subscriptionExpiresAt.toISOString() : undefined;
+      appData.homeownerCount = homeownerCount;
 
       await this.setAppData(appData);
 
@@ -276,7 +279,7 @@ export const StorageService = {
   },
 
   // Upgrade subscription
-  async upgradeSubscription(hoaId: string, tier: 'basic' | 'premium'): Promise<boolean> {
+  async upgradeSubscription(hoaId: string, tier: 'paid'): Promise<boolean> {
     try {
       const appData = await this.getAppData();
       
