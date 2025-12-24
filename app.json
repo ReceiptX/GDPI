@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "GDPI",
-    "slug": "gdpi",
+    "slug": "garagedoorpricingindex",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -30,7 +30,11 @@
     },
     "extra": {
       "groqApiKey": "${GROQ_API_KEY}",
-      "otlpEndpoint": "${OTEL_EXPORTER_OTLP_ENDPOINT}"
-    }
+      "otlpEndpoint": "${OTEL_EXPORTER_OTLP_ENDPOINT}",
+      "eas": {
+        "projectId": "409a685a-0eb7-4438-ad82-d9350738dc0d"
+      }
+    },
+    "owner": "garagedoorpricingindex"
   }
 }
