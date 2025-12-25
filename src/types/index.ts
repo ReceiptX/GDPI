@@ -6,6 +6,8 @@ export type QuoteVerdict = 'green' | 'yellow' | 'red';
 
 export type JobTiming = 'scheduled' | 'after-hours';
 
+export type BillingInterval = 'monthly' | 'annual';
+
 export interface User {
   email: string;
   pin: string;
@@ -33,17 +35,34 @@ export interface Quote {
   notes: string;
 }
 
-export type SubscriptionTier = 'trial' | 'paid';
-
 export interface AppData {
   hoaId: string;
   residents: Resident[];
   quoteHistory: Quote[];
-  subscribed: boolean;
-  subscriptionTier: SubscriptionTier;
-  subscriptionExpiresAt?: string; // ISO date string
-  trialStartedAt?: string; // ISO date string
-  homeownerCount?: number; // Number of homeowners for pricing calculation
+  subscriptions: SubscriptionRecord[];
+}
+
+export interface SubscriptionPlan {
+  id: string;
+  label: string;
+  price: number;
+  currency: string;
+  billingInterval: BillingInterval;
+  lockDurationYears: number;
+  includesFutureServices: boolean;
+  description: string;
+  perks: string[];
+}
+
+export interface SubscriptionRecord {
+  hoaId: string;
+  planId: string;
+  lockedPrice: number;
+  currency: string;
+  billingInterval: BillingInterval;
+  lockStart: string;
+  lockExpires: string;
+  includesFutureServices: boolean;
 }
 
 export interface AIAnalysisResult {
@@ -88,16 +107,4 @@ export interface HOARegistration {
   hoaName: string;
   adminEmail: string;
   adminName: string;
-  billingEmail?: string;
-  subscriptionTier: SubscriptionTier;
-  trialDays?: number; // Default 14 days
-  homeownerCount: number; // Number of homeowners in HOA for pricing
-}
-
-export interface PricingInfo {
-  homeownerCount: number;
-  pricePerHomeowner: number; // $3.00 or $1.50 with bulk discount
-  monthlyTotal: number;
-  hasBulkDiscount: boolean;
-  discountThreshold: number; // Number of homeowners needed for bulk pricing
 }

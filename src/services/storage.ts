@@ -1,18 +1,16 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AppData, User, Quote, Resident } from '../types';
+import { AppData, User, Quote, Resident, HOARegistration, SubscriptionRecord } from '../types';
+import { buildSubscriptionRecord } from '../utils/subscription';
 
 const STORAGE_KEY = 'gdpi_app_data';
 const USER_KEY = 'gdpi_current_user';
 
-  // Initialize default app data
+// Initialize default app data
 const defaultAppData: AppData = {
   hoaId: '',
   residents: [],
   quoteHistory: [],
-  subscribed: false,
-  subscriptionTier: 'trial',
-  trialStartedAt: new Date().toISOString(),
-  homeownerCount: 0,
+  subscriptions: [],
 };
 
 export const StorageService = {
@@ -49,7 +47,17 @@ export const StorageService = {
   async getAppData(): Promise<AppData> {
     try {
       const data = await AsyncStorage.getItem(STORAGE_KEY);
-      return data ? JSON.parse(data) : defaultAppData;
+      if (!data) {
+        return { ...defaultAppData };
+      }
+      const parsed = JSON.parse(data);
+      return {
+        ...defaultAppData,
+        ...parsed,
+        residents: parsed?.residents ?? [],
+        quoteHistory: parsed?.quoteHistory ?? [],
+        subscriptions: parsed?.subscriptions ?? [],
+      };
     } catch (error) {
       console.error('Error getting app data:', error);
       return defaultAppData;
@@ -141,6 +149,32 @@ export const StorageService = {
     }
   },
 
+  async getSubscriptionByHoaId(hoaId: string): Promise<SubscriptionRecord | null> {
+    try {
+      const appData = await this.getAppData();
+      return appData.subscriptions.find((record) => record.hoaId === hoaId) ?? null;
+    } catch (error) {
+      console.error('Error getting subscription info:', error);
+      return null;
+    }
+  },
+
+  async upsertSubscription(record: SubscriptionRecord): Promise<void> {
+    try {
+      const appData = await this.getAppData();
+      const index = appData.subscriptions.findIndex((entry) => entry.hoaId === record.hoaId);
+      if (index >= 0) {
+        appData.subscriptions[index] = record;
+      } else {
+        appData.subscriptions.push(record);
+      }
+      await this.setAppData(appData);
+    } catch (error) {
+      console.error('Error saving subscription info:', error);
+      throw error;
+    }
+  },
+
   // Authentication helper
   async authenticateUser(hoaId: string, email: string, pin: string): Promise<User | null> {
     try {
@@ -171,9 +205,6 @@ export const StorageService = {
       // Only initialize if no data exists
       if (appData.residents.length === 0) {
         appData.hoaId = 'hoa001';
-        appData.subscribed = true;
-        appData.subscriptionTier = 'paid';
-        appData.homeownerCount = 85; // Demo HOA with 85 homeowners
         appData.residents = [
           { 
             email: 'admin@hoa001.com', 
@@ -190,6 +221,14 @@ export const StorageService = {
             createdAt: new Date().toISOString()
           },
         ];
+
+        const demoPlan = buildSubscriptionRecord('hoa001');
+        const subIndex = appData.subscriptions.findIndex((entry) => entry.hoaId === 'hoa001');
+        if (subIndex >= 0) {
+          appData.subscriptions[subIndex] = demoPlan;
+        } else {
+          appData.subscriptions.push(demoPlan);
+        }
         
         await this.setAppData(appData);
       }
@@ -199,9 +238,9 @@ export const StorageService = {
   },
 
   // HOA Registration (Production-ready)
-  async registerHOA(registration: any): Promise<{ success: boolean; adminPin: string; error?: string }> {
+  async registerHOA(registration: HOARegistration): Promise<{ success: boolean; adminPin: string; plan?: SubscriptionRecord; error?: string }> {
     try {
-      const { hoaId, hoaName, adminEmail, adminName, subscriptionTier = 'trial', trialDays = 14, homeownerCount = 1 } = registration;
+      const { hoaId, hoaName, adminEmail, adminName } = registration;
       
       const appData = await this.getAppData();
       
@@ -213,11 +252,6 @@ export const StorageService = {
       // Generate secure PIN using crypto
       const adminPin = await this.generateSecurePin();
       
-      // Calculate trial expiration
-      const trialStartedAt = new Date();
-      const subscriptionExpiresAt = new Date(trialStartedAt);
-      subscriptionExpiresAt.setDate(subscriptionExpiresAt.getDate() + trialDays);
-
       // Create admin user
       const admin: Resident = {
         email: adminEmail,
@@ -227,75 +261,25 @@ export const StorageService = {
         createdAt: new Date().toISOString(),
       };
 
+      const planRecord = buildSubscriptionRecord(hoaId);
+
       // Update app data
       appData.hoaId = hoaId;
       appData.residents.push(admin);
-      appData.subscribed = subscriptionTier === 'trial' || subscriptionTier === 'paid';
-      appData.subscriptionTier = subscriptionTier;
-      appData.trialStartedAt = trialStartedAt.toISOString();
-      appData.subscriptionExpiresAt = subscriptionTier === 'trial' ? subscriptionExpiresAt.toISOString() : undefined;
-      appData.homeownerCount = homeownerCount;
+
+      const subscriptionIndex = appData.subscriptions.findIndex((entry) => entry.hoaId === hoaId);
+      if (subscriptionIndex >= 0) {
+        appData.subscriptions[subscriptionIndex] = planRecord;
+      } else {
+        appData.subscriptions.push(planRecord);
+      }
 
       await this.setAppData(appData);
 
-      return { success: true, adminPin };
+      return { success: true, adminPin, plan: planRecord };
     } catch (error) {
       console.error('Error registering HOA:', error);
       return { success: false, adminPin: '', error: 'Registration failed' };
-    }
-  },
-
-  // Check subscription status
-  async checkSubscription(hoaId: string): Promise<{ active: boolean; tier: string; daysRemaining?: number }> {
-    try {
-      const appData = await this.getAppData();
-      
-      if (appData.hoaId !== hoaId) {
-        return { active: false, tier: 'none' };
-      }
-
-      if (!appData.subscribed) {
-        return { active: false, tier: 'none' };
-      }
-
-      // Check if trial expired
-      if (appData.subscriptionTier === 'trial' && appData.subscriptionExpiresAt) {
-        const expiresAt = new Date(appData.subscriptionExpiresAt);
-        const now = new Date();
-        
-        if (now > expiresAt) {
-          return { active: false, tier: 'trial_expired' };
-        }
-
-        const daysRemaining = Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-        return { active: true, tier: appData.subscriptionTier, daysRemaining };
-      }
-
-      return { active: true, tier: appData.subscriptionTier };
-    } catch (error) {
-      console.error('Error checking subscription:', error);
-      return { active: false, tier: 'error' };
-    }
-  },
-
-  // Upgrade subscription
-  async upgradeSubscription(hoaId: string, tier: 'paid'): Promise<boolean> {
-    try {
-      const appData = await this.getAppData();
-      
-      if (appData.hoaId !== hoaId) {
-        return false;
-      }
-
-      appData.subscriptionTier = tier;
-      appData.subscribed = true;
-      appData.subscriptionExpiresAt = undefined; // No expiration for paid tiers
-
-      await this.setAppData(appData);
-      return true;
-    } catch (error) {
-      console.error('Error upgrading subscription:', error);
-      return false;
     }
   },
 
