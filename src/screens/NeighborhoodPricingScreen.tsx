@@ -11,6 +11,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { User, Quote } from '../types';
 import { StorageService } from '../services/storage';
 import { telemetry } from '../services/telemetry';
+import { colors } from '../utils/theme';
 
 type NeighborhoodPricingScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -91,10 +92,10 @@ export default function NeighborhoodPricingScreen({
 
   const getVerdictColor = (verdict: string) => {
     switch (verdict) {
-      case 'green': return '#10b981';
-      case 'yellow': return '#f59e0b';
-      case 'red': return '#ef4444';
-      default: return '#6b7280';
+      case 'green': return colors.success;
+      case 'yellow': return colors.warning;
+      case 'red': return colors.danger;
+      default: return colors.textMuted;
     }
   };
 
@@ -110,7 +111,7 @@ export default function NeighborhoodPricingScreen({
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#2563eb" />
+        <ActivityIndicator size="large" color={colors.accent} />
         <Text style={styles.loadingText}>Loading pricing history...</Text>
       </View>
     );
@@ -210,7 +211,7 @@ export default function NeighborhoodPricingScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: colors.bg,
   },
   content: {
     padding: 16,
@@ -220,53 +221,52 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f3f4f6',
+    backgroundColor: colors.bg,
   },
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: '#6b7280',
+    color: colors.textMuted,
   },
   headerText: {
     fontSize: 14,
-    color: '#6b7280',
+    color: colors.textMuted,
     marginBottom: 16,
     lineHeight: 20,
   },
   emptyState: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 32,
     alignItems: 'center',
     marginTop: 32,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   emptyStateTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1f2937',
+    fontWeight: '800',
+    color: colors.text,
     marginBottom: 8,
   },
   emptyStateText: {
     fontSize: 14,
-    color: '#6b7280',
+    color: colors.textMuted,
     textAlign: 'center',
     lineHeight: 20,
   },
   statsCard: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 16,
     marginBottom: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   statsTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1f2937',
+    fontWeight: '800',
+    color: colors.text,
     marginBottom: 16,
   },
   statsGrid: {
@@ -278,39 +278,39 @@ const styles = StyleSheet.create({
   statItem: {
     flex: 1,
     minWidth: '45%',
-    backgroundColor: '#f9fafb',
+    backgroundColor: colors.surfaceMuted,
     borderRadius: 8,
     padding: 12,
     alignItems: 'center',
   },
   statValue: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#2563eb',
+    fontWeight: '800',
+    color: colors.accent,
   },
   statLabel: {
     fontSize: 12,
-    color: '#6b7280',
+    color: colors.textMuted,
     marginTop: 4,
   },
   statsFooter: {
     fontSize: 12,
-    color: '#6b7280',
+    color: colors.textMuted,
     textAlign: 'center',
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1f2937',
+    fontWeight: '800',
+    color: colors.text,
     marginBottom: 12,
   },
   quoteCard: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: colors.border,
   },
   quoteHeader: {
     flexDirection: 'row',
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
   },
   quoteDate: {
     fontSize: 12,
-    color: '#6b7280',
+    color: colors.textMuted,
   },
   verdictBadge: {
     paddingHorizontal: 8,
@@ -329,49 +329,49 @@ const styles = StyleSheet.create({
   },
   verdictText: {
     fontSize: 10,
-    fontWeight: 'bold',
+    fontWeight: '800',
     color: '#fff',
   },
   quoteJobType: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#1f2937',
+    fontWeight: '800',
+    color: colors.text,
     marginBottom: 8,
   },
   quoteDetail: {
     fontSize: 14,
-    color: '#6b7280',
+    color: colors.textMuted,
     marginBottom: 4,
   },
   quoteAmount: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#2563eb',
+    fontWeight: '800',
+    color: colors.accentAlt,
     marginTop: 8,
   },
   quoteNotes: {
     fontSize: 12,
-    color: '#9ca3af',
+    color: colors.textMuted,
     marginTop: 8,
     fontStyle: 'italic',
   },
   educationCard: {
-    backgroundColor: '#eff6ff',
+    backgroundColor: colors.surfaceElevated,
     borderRadius: 12,
     padding: 16,
     marginTop: 16,
-    borderWidth: 2,
-    borderColor: '#bfdbfe',
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   educationTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#1e40af',
+    fontWeight: '800',
+    color: colors.text,
     marginBottom: 12,
   },
   educationItem: {
     fontSize: 14,
-    color: '#1e3a8a',
+    color: colors.text,
     marginBottom: 8,
     lineHeight: 20,
   },

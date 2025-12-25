@@ -8,9 +8,11 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { StorageService } from '../services/storage';
 import { telemetry } from '../services/telemetry';
+import { colors, spacing, radius } from '../utils/theme';
 
 interface LoginScreenProps {
   onLogin: (user: any) => void;
@@ -30,77 +32,42 @@ export default function LoginScreen({ onLogin, onRegister }: LoginScreenProps) {
     }
 
     setLoading(true);
-
     try {
-      await telemetry.traceOperation(
-        'user.login',
-        { hoaId, email },
-        async () => {
-          const user = await StorageService.authenticateUser(hoaId, email, pin);
+      await telemetry.traceOperation('user.login', { hoaId, email }, async () => {
+        const user = await StorageService.authenticateUser(hoaId.trim().toLowerCase(), email.trim().toLowerCase(), pin.trim());
 
-          if (user) {
-            // Check subscription status
-            const subscription = await StorageService.checkSubscription(hoaId);
-            
-            if (!subscription.active) {
-              Alert.alert(
-                'Subscription Required',
-                subscription.tier === 'trial_expired' 
-                  ? 'Your trial has expired. Please upgrade to continue using GDPI.'
-                  : 'This HOA does not have an active subscription. Please contact your administrator.',
-                [{ text: 'OK' }]
-              );
-              setLoading(false);
-              return;
-            }
-
-            // Show trial warning if less than 3 days remaining
-            if (subscription.tier === 'trial' && subscription.daysRemaining && subscription.daysRemaining <= 3) {
-              Alert.alert(
-                'Trial Ending Soon',
-                `Your trial expires in ${subscription.daysRemaining} days. Upgrade to continue using GDPI.`,
-                [{ text: 'OK', onPress: () => {
-                  StorageService.setCurrentUser(user);
-                  onLogin(user);
-                }}]
-              );
-            } else {
-              await StorageService.setCurrentUser(user);
-              onLogin(user);
-            }
-          } else {
-            Alert.alert(
-              'Login Failed',
-              'Invalid credentials. Please check your HOA ID, email, and PIN.\n\nDemo credentials:\nHOA: hoa001\nEmail: admin@hoa001.com or resident@hoa001.com\nPIN: 1234 or 5678'
-            );
-          }
+        if (user) {
+          await StorageService.setCurrentUser(user);
+          onLogin(user);
+          return;
         }
-      );
+
+        Alert.alert(
+          'Login Failed',
+          'Invalid credentials. Please check your HOA ID, email, and PIN.\n\nDemo credentials:\nHOA: hoa001\nEmail: admin@hoa001.com or resident@hoa001.com\nPIN: 1234 or 5678'
+        );
+      });
     } catch (error) {
-      Alert.alert('Error', 'An error occurred during login. Please try again.');
       console.error('Login error:', error);
+      Alert.alert('Error', 'An error occurred during login. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <View style={styles.content}>
         <Text style={styles.title}>GDPI</Text>
         <Text style={styles.subtitle}>Garage Door Pricing Index</Text>
-        <Text style={styles.description}>
-          Protect your community from overpriced garage door quotes
-        </Text>
+        <Text style={styles.description}>Protect your community from overpriced garage door quotes.</Text>
 
         <View style={styles.form}>
           <Text style={styles.label}>HOA ID</Text>
           <TextInput
             style={styles.input}
             placeholder="e.g., hoa001"
+            placeholderTextColor={colors.textMuted}
             value={hoaId}
             onChangeText={setHoaId}
             autoCapitalize="none"
@@ -111,6 +78,7 @@ export default function LoginScreen({ onLogin, onRegister }: LoginScreenProps) {
           <TextInput
             style={styles.input}
             placeholder="your@email.com"
+            placeholderTextColor={colors.textMuted}
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
@@ -121,7 +89,8 @@ export default function LoginScreen({ onLogin, onRegister }: LoginScreenProps) {
           <Text style={styles.label}>PIN</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter your 4-digit PIN"
+            placeholder="4-digit PIN"
+            placeholderTextColor={colors.textMuted}
             value={pin}
             onChangeText={setPin}
             secureTextEntry
@@ -129,28 +98,18 @@ export default function LoginScreen({ onLogin, onRegister }: LoginScreenProps) {
             maxLength={4}
           />
 
-          <TouchableOpacity
-            style={[styles.button, loading && styles.buttonDisabled]}
-            onPress={handleLogin}
-            disabled={loading}
-          >
-            <Text style={styles.buttonText}>
-              {loading ? 'Logging in...' : 'Login'}
-            </Text>
+          <TouchableOpacity style={[styles.button, loading && styles.buttonDisabled]} onPress={handleLogin} disabled={loading}>
+            {loading ? <ActivityIndicator color={colors.text} /> : <Text style={styles.buttonText}>Sign in</Text>}
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.footer}>
-          Arizona HOAs only • No PII collected • Licensed vendors recommended
-        </Text>
-
         {onRegister && (
-          <TouchableOpacity style={styles.registerLink} onPress={onRegister}>
-            <Text style={styles.registerLinkText}>
-              Don't have an account? Register your HOA
-            </Text>
+          <TouchableOpacity style={styles.registerLink} onPress={onRegister} disabled={loading}>
+            <Text style={styles.registerLinkText}>Don't have an account? Register your HOA</Text>
           </TouchableOpacity>
         )}
+
+        <Text style={styles.footer}>Arizona HOAs only • Minimal data • PIN-based access</Text>
       </View>
     </KeyboardAvoidingView>
   );
@@ -159,86 +118,92 @@ export default function LoginScreen({ onLogin, onRegister }: LoginScreenProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: colors.bg,
   },
   content: {
     flex: 1,
     justifyContent: 'center',
-    padding: 24,
+    padding: spacing.lg,
   },
   title: {
-    fontSize: 48,
-    fontWeight: 'bold',
-    color: '#2563eb',
-    textAlign: 'center',
-    marginBottom: 8,
+    fontSize: 38,
+    fontWeight: '900',
+    color: colors.text,
   },
   subtitle: {
-    fontSize: 18,
-    color: '#4b5563',
-    textAlign: 'center',
-    marginBottom: 8,
+    marginTop: 6,
+    fontSize: 14,
+    fontWeight: '800',
+    color: colors.accent,
+    letterSpacing: 0.7,
+    textTransform: 'uppercase',
   },
   description: {
+    marginTop: spacing.sm,
+    marginBottom: spacing.lg,
     fontSize: 14,
-    color: '#6b7280',
-    textAlign: 'center',
-    marginBottom: 32,
+    lineHeight: 20,
+    fontWeight: '700',
+    color: colors.textMuted,
   },
   form: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#374151',
+    marginTop: spacing.md,
     marginBottom: 8,
-    marginTop: 16,
+    fontSize: 13,
+    fontWeight: '800',
+    color: colors.text,
   },
   input: {
+    height: 48,
     borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 8,
-    padding: 12,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    paddingHorizontal: 12,
     fontSize: 16,
-    backgroundColor: '#fff',
+    fontWeight: '700',
+    backgroundColor: colors.surfaceMuted,
+    color: colors.text,
   },
   button: {
-    backgroundColor: '#2563eb',
-    borderRadius: 8,
-    padding: 16,
+    marginTop: spacing.lg,
+    height: 48,
+    borderRadius: radius.md,
+    backgroundColor: colors.accentAlt,
+    borderWidth: 1,
+    borderColor: colors.accent,
     alignItems: 'center',
-    marginTop: 24,
+    justifyContent: 'center',
   },
   buttonDisabled: {
-    backgroundColor: '#93c5fd',
+    backgroundColor: 'rgba(56, 189, 248, 0.35)',
   },
   buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  footer: {
-    fontSize: 12,
-    color: '#9ca3af',
-    textAlign: 'center',
-    marginTop: 24,
+    color: colors.text,
+    fontSize: 14,
+    fontWeight: '900',
   },
   registerLink: {
-    marginTop: 16,
-    padding: 12,
+    marginTop: spacing.md,
+    padding: 10,
     alignItems: 'center',
   },
   registerLinkText: {
     fontSize: 14,
-    color: '#2563eb',
-    fontWeight: '600',
+    fontWeight: '800',
+    color: colors.accent,
+  },
+  footer: {
+    marginTop: spacing.md,
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.textMuted,
+    textAlign: 'center',
   },
 });

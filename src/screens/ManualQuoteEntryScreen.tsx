@@ -16,6 +16,7 @@ import { AIService } from '../services/ai';
 import { StorageService } from '../services/storage';
 import { telemetry } from '../services/telemetry';
 import config from '../utils/config';
+import { colors } from '../utils/theme';
 
 type ManualQuoteEntryScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -143,9 +144,9 @@ export default function ManualQuoteEntryScreen({
 
   const getVerdictColor = (verdict: string) => {
     switch (verdict) {
-      case 'green': return '#10b981';
-      case 'yellow': return '#f59e0b';
-      case 'red': return '#ef4444';
+      case 'green': return colors.success;
+      case 'yellow': return colors.warning;
+      case 'red': return colors.danger;
     }
   };
 
@@ -200,6 +201,7 @@ export default function ManualQuoteEntryScreen({
         <TextInput
           style={styles.input}
           placeholder="e.g., Weatherstripping, tune-up"
+          placeholderTextColor={colors.textMuted}
           value={otherParts}
           onChangeText={setOtherParts}
         />
@@ -208,6 +210,7 @@ export default function ManualQuoteEntryScreen({
         <TextInput
           style={styles.input}
           placeholder="e.g., 450"
+          placeholderTextColor={colors.textMuted}
           value={laborCost}
           onChangeText={setLaborCost}
           keyboardType="numeric"
@@ -217,6 +220,7 @@ export default function ManualQuoteEntryScreen({
         <TextInput
           style={styles.input}
           placeholder="e.g., Double, insulated, 7ft"
+          placeholderTextColor={colors.textMuted}
           value={doorSetup}
           onChangeText={setDoorSetup}
         />
@@ -255,6 +259,7 @@ export default function ManualQuoteEntryScreen({
         <TextInput
           style={styles.textArea}
           placeholder="Any other details about the quote..."
+          placeholderTextColor={colors.textMuted}
           value={notes}
           onChangeText={setNotes}
           multiline
@@ -324,7 +329,7 @@ export default function ManualQuoteEntryScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: colors.bg,
   },
   content: {
     padding: 16,
@@ -332,39 +337,41 @@ const styles = StyleSheet.create({
   },
   instructions: {
     fontSize: 14,
-    color: '#6b7280',
+    color: colors.textMuted,
     marginBottom: 16,
     lineHeight: 20,
   },
   label: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#374151',
+    fontWeight: '700',
+    color: colors.text,
     marginBottom: 8,
     marginTop: 16,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#d1d5db',
+    borderColor: colors.border,
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surfaceMuted,
+    color: colors.text,
   },
   textArea: {
     borderWidth: 1,
-    borderColor: '#d1d5db',
+    borderColor: colors.border,
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surfaceMuted,
+    color: colors.text,
     minHeight: 100,
   },
   checkboxGroup: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#d1d5db',
+    borderColor: colors.border,
     padding: 8,
   },
   checkbox: {
@@ -376,25 +383,26 @@ const styles = StyleSheet.create({
   checkboxBox: {
     width: 24,
     height: 24,
-    borderWidth: 2,
-    borderColor: '#d1d5db',
+    borderWidth: 1,
+    borderColor: colors.border,
     borderRadius: 4,
     marginRight: 12,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: colors.surfaceMuted,
   },
   checkboxBoxChecked: {
-    backgroundColor: '#2563eb',
-    borderColor: '#2563eb',
+    backgroundColor: colors.accentAlt,
+    borderColor: colors.accent,
   },
   checkboxCheck: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '800',
   },
   checkboxLabel: {
     fontSize: 16,
-    color: '#1f2937',
+    color: colors.text,
   },
   radioGroup: {
     flexDirection: 'row',
@@ -402,49 +410,49 @@ const styles = StyleSheet.create({
   },
   radioButton: {
     flex: 1,
-    borderWidth: 2,
-    borderColor: '#d1d5db',
+    borderWidth: 1,
+    borderColor: colors.border,
     borderRadius: 8,
     padding: 12,
     alignItems: 'center',
+    backgroundColor: colors.surface,
   },
   radioButtonSelected: {
-    borderColor: '#2563eb',
-    backgroundColor: '#eff6ff',
+    borderColor: colors.accent,
+    backgroundColor: colors.accentSoft,
   },
   radioButtonText: {
     fontSize: 14,
-    color: '#6b7280',
+    color: colors.textMuted,
   },
   radioButtonTextSelected: {
-    color: '#2563eb',
-    fontWeight: '600',
+    color: colors.accent,
+    fontWeight: '700',
   },
   analyzeButton: {
-    backgroundColor: '#2563eb',
+    backgroundColor: colors.accentAlt,
     borderRadius: 8,
     padding: 16,
     alignItems: 'center',
     marginTop: 24,
+    borderWidth: 1,
+    borderColor: colors.accent,
   },
   analyzeButtonDisabled: {
-    backgroundColor: '#93c5fd',
+    backgroundColor: 'rgba(56, 189, 248, 0.35)',
   },
   analyzeButtonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   resultCard: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 16,
     marginTop: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   verdictBadge: {
     borderRadius: 8,
@@ -454,7 +462,7 @@ const styles = StyleSheet.create({
   },
   verdictText: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '800',
     color: '#fff',
   },
   resultSection: {
@@ -462,26 +470,26 @@ const styles = StyleSheet.create({
   },
   resultSectionTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#1f2937',
+    fontWeight: '800',
+    color: colors.text,
     marginBottom: 8,
   },
   resultText: {
     fontSize: 14,
-    color: '#4b5563',
+    color: colors.text,
     lineHeight: 20,
   },
   resultItem: {
     fontSize: 14,
-    color: '#4b5563',
+    color: colors.text,
     marginBottom: 6,
     lineHeight: 20,
   },
   savedNote: {
     fontSize: 12,
-    color: '#10b981',
+    color: colors.success,
     textAlign: 'center',
     marginTop: 8,
-    fontWeight: '600',
+    fontWeight: '700',
   },
 });

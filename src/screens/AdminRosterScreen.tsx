@@ -14,6 +14,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { User, Resident } from '../types';
 import { StorageService } from '../services/storage';
 import { telemetry } from '../services/telemetry';
+import { colors } from '../utils/theme';
 
 type AdminRosterScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -195,7 +196,7 @@ export default function AdminRosterScreen({
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#2563eb" />
+        <ActivityIndicator size="large" color={colors.accent} />
         <Text style={styles.loadingText}>Loading residents...</Text>
       </View>
     );
@@ -215,6 +216,7 @@ export default function AdminRosterScreen({
           <TextInput
             style={styles.input}
             placeholder="resident@email.com"
+            placeholderTextColor={colors.textMuted}
             value={newEmail}
             onChangeText={setNewEmail}
             autoCapitalize="none"
@@ -226,6 +228,7 @@ export default function AdminRosterScreen({
           <TextInput
             style={styles.input}
             placeholder="4-digit PIN"
+            placeholderTextColor={colors.textMuted}
             value={newPin}
             onChangeText={setNewPin}
             keyboardType="numeric"
@@ -309,7 +312,7 @@ export default function AdminRosterScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: colors.bg,
   },
   content: {
     padding: 16,
@@ -319,98 +322,98 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f3f4f6',
+    backgroundColor: colors.bg,
   },
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: '#6b7280',
+    color: colors.textMuted,
   },
   headerText: {
     fontSize: 14,
-    color: '#6b7280',
+    color: colors.textMuted,
     marginBottom: 24,
   },
   addSection: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 16,
     marginBottom: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1f2937',
+    fontWeight: '800',
+    color: colors.text,
     marginBottom: 16,
   },
   label: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#374151',
+    fontWeight: '700',
+    color: colors.text,
     marginBottom: 8,
     marginTop: 12,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#d1d5db',
+    borderColor: colors.border,
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surfaceMuted,
+    color: colors.text,
   },
   addButton: {
-    backgroundColor: '#10b981',
+    backgroundColor: colors.success,
     borderRadius: 8,
     padding: 16,
     alignItems: 'center',
     marginTop: 16,
   },
   addButtonDisabled: {
-    backgroundColor: '#6ee7b7',
+    backgroundColor: 'rgba(74, 222, 128, 0.35)',
   },
   addButtonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   rosterSection: {
     marginBottom: 24,
   },
   emptyState: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 32,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   emptyStateText: {
     fontSize: 14,
-    color: '#9ca3af',
+    color: colors.textMuted,
   },
   residentCard: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: colors.border,
   },
   residentInfo: {
     marginBottom: 12,
   },
   residentEmail: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#1f2937',
+    fontWeight: '800',
+    color: colors.text,
     marginBottom: 4,
   },
   residentPin: {
     fontSize: 14,
-    color: '#6b7280',
+    color: colors.textMuted,
     fontFamily: 'monospace',
   },
   residentActions: {
@@ -419,41 +422,41 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   actionButton: {
-    backgroundColor: '#eff6ff',
+    backgroundColor: colors.surfaceMuted,
     borderRadius: 6,
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: '#bfdbfe',
+    borderColor: colors.border,
   },
   actionButtonText: {
     fontSize: 12,
-    color: '#1e40af',
-    fontWeight: '600',
+    color: colors.accent,
+    fontWeight: '700',
   },
   removeButton: {
-    backgroundColor: '#fee2e2',
-    borderColor: '#fecaca',
+    backgroundColor: 'rgba(248, 113, 113, 0.15)',
+    borderColor: colors.danger,
   },
   removeButtonText: {
-    color: '#991b1b',
+    color: colors.danger,
   },
   infoCard: {
-    backgroundColor: '#fef3c7',
+    backgroundColor: colors.surfaceElevated,
     borderRadius: 12,
     padding: 16,
-    borderWidth: 2,
-    borderColor: '#fbbf24',
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   infoTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#92400e',
+    fontWeight: '800',
+    color: colors.text,
     marginBottom: 12,
   },
   infoItem: {
     fontSize: 14,
-    color: '#78350f',
+    color: colors.text,
     marginBottom: 6,
     lineHeight: 20,
   },

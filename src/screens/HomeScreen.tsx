@@ -1,16 +1,10 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  Alert,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { User } from '../types';
 import { StorageService } from '../services/storage';
+import { colors, spacing, radius } from '../utils/theme';
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
@@ -21,7 +15,7 @@ interface HomeScreenProps {
 }
 
 export default function HomeScreen({ navigation, user, onLogout }: HomeScreenProps) {
-  const handleLogout = async () => {
+  const handleLogout = () => {
     Alert.alert('Logout', 'Are you sure you want to logout?', [
       { text: 'Cancel', style: 'cancel' },
       {
@@ -36,93 +30,59 @@ export default function HomeScreen({ navigation, user, onLogout }: HomeScreenPro
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <Text style={styles.welcomeText}>Welcome, {user.email}</Text>
-          <Text style={styles.roleText}>
-            {user.role === 'admin' ? 'HOA Administrator' : 'Resident'}
-          </Text>
-          <Text style={styles.hoaText}>HOA: {user.hoaId}</Text>
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <View style={styles.headerCard}>
+        <Text style={styles.welcome}>Welcome</Text>
+        <Text style={styles.email}>{user.email}</Text>
+        <View style={styles.metaRow}>
+          <Text style={styles.metaPill}>{user.role === 'admin' ? 'Admin' : 'Resident'}</Text>
+          <Text style={styles.metaText}>HOA: {user.hoaId}</Text>
         </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Analyze a Quote</Text>
-          
-          <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={() => navigation.navigate('AIQuoteAnalysis')}
-          >
-            <Text style={styles.primaryButtonText}>📄 AI Analyze My Quote</Text>
-            <Text style={styles.buttonSubtext}>
-              Upload or paste written quote for instant AI analysis
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.secondaryButton}
-            onPress={() => navigation.navigate('ManualQuoteEntry')}
-          >
-            <Text style={styles.secondaryButtonText}>✍️ Manual Entry</Text>
-            <Text style={styles.buttonSubtext}>
-              No written quote? Enter parts & labor manually
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Community Data</Text>
-          
-          <TouchableOpacity
-            style={styles.secondaryButton}
-            onPress={() => navigation.navigate('NeighborhoodPricing')}
-          >
-            <Text style={styles.secondaryButtonText}>📊 Neighborhood Pricing</Text>
-            <Text style={styles.buttonSubtext}>
-              See anonymized pricing history from your HOA
-            </Text>
-          </TouchableOpacity>
-
-          {user.role === 'admin' && (
-            <TouchableOpacity
-              style={styles.adminButton}
-              onPress={() => navigation.navigate('AdminRoster')}
-            >
-              <Text style={styles.adminButtonText}>👥 Manage Residents</Text>
-              <Text style={styles.buttonSubtext}>
-                Add/remove residents, rotate PINs
-              </Text>
-            </TouchableOpacity>
-          )}
-        </View>
-
-        <View style={styles.educationCard}>
-          <Text style={styles.educationTitle}>⚠️ Arizona Baseline Pricing</Text>
-          <View style={styles.pricingList}>
-            <Text style={styles.pricingItem}>• Service Call: $75-$150</Text>
-            <Text style={styles.pricingItem}>• Torsion Springs (pair): $320-$520</Text>
-            <Text style={styles.pricingItem}>• Rollers + Tune-up: $180-$320</Text>
-            <Text style={styles.pricingItem}>• Opener Replacement: $650-$900</Text>
-            <Text style={styles.pricingItem}>• Double Door: $2,400-$3,600</Text>
-          </View>
-          <Text style={styles.educationFooter}>
-            🚨 After-hours typically 1.4-2.0× scheduled rates
-          </Text>
-        </View>
-
-        <View style={styles.warningCard}>
-          <Text style={styles.warningTitle}>Common Hustler Tactics</Text>
-          <Text style={styles.warningItem}>• Vague "lifetime" warranty kits</Text>
-          <Text style={styles.warningItem}>• Duplicate line item charges</Text>
-          <Text style={styles.warningItem}>• Unnecessary full door replacement</Text>
-          <Text style={styles.warningItem}>• Extreme labor markups</Text>
-          <Text style={styles.warningItem}>• Refurbished parts sold as new</Text>
-        </View>
-
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutButtonText}>Logout</Text>
-        </TouchableOpacity>
       </View>
+
+      <Text style={styles.sectionTitle}>Actions</Text>
+
+      <TouchableOpacity style={[styles.cardBtn, styles.cardBtnPrimary]} onPress={() => navigation.navigate('AIQuoteAnalysis')}>
+        <Text style={styles.cardBtnTitle}>AI Quote Analysis</Text>
+        <Text style={styles.cardBtnSub}>Paste a written quote for instant red-flag detection.</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.cardBtn} onPress={() => navigation.navigate('ManualQuoteEntry')}>
+        <Text style={styles.cardBtnTitle}>Manual Quote Entry</Text>
+        <Text style={styles.cardBtnSub}>No written quote? Enter parts & labor manually.</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.cardBtn} onPress={() => navigation.navigate('NeighborhoodPricing')}>
+        <Text style={styles.cardBtnTitle}>Neighborhood Pricing</Text>
+        <Text style={styles.cardBtnSub}>See min/avg/max pricing from your HOA's history.</Text>
+      </TouchableOpacity>
+
+      {user.role === 'admin' && (
+        <TouchableOpacity style={[styles.cardBtn, styles.cardBtnAdmin]} onPress={() => navigation.navigate('AdminRoster')}>
+          <Text style={styles.cardBtnTitle}>Manage Residents</Text>
+          <Text style={styles.cardBtnSub}>Add/remove residents, rotate PINs, and assign roles.</Text>
+        </TouchableOpacity>
+      )}
+
+      <View style={styles.infoCard}>
+        <Text style={styles.infoTitle}>Arizona baseline pricing (quick reference)</Text>
+        <Text style={styles.infoItem}>• Service call: $75–$150</Text>
+        <Text style={styles.infoItem}>• Torsion springs (pair): $320–$520</Text>
+        <Text style={styles.infoItem}>• Opener replacement: $450–$950</Text>
+        <Text style={styles.infoItem}>• Double door replacement: $2,400–$3,600</Text>
+      </View>
+
+      <View style={styles.warningCard}>
+        <Text style={styles.warningTitle}>Common hustle tactics</Text>
+        <Text style={styles.warningItem}>• Vague “lifetime” warranty bundles</Text>
+        <Text style={styles.warningItem}>• Unnecessary full door replacement</Text>
+        <Text style={styles.warningItem}>• Extreme labor markups</Text>
+        <Text style={styles.warningItem}>• Refurbished parts sold as new</Text>
+      </View>
+
+      <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
+        <Text style={styles.logoutText}>Logout</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 }
@@ -130,150 +90,143 @@ export default function HomeScreen({ navigation, user, onLogout }: HomeScreenPro
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: colors.bg,
   },
   content: {
-    padding: 16,
-    paddingBottom: 32,
+    padding: spacing.lg,
+    paddingBottom: spacing.xl,
   },
-  header: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+  headerCard: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
-  welcomeText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1f2937',
-    marginBottom: 4,
-  },
-  roleText: {
-    fontSize: 14,
-    color: '#2563eb',
-    marginBottom: 2,
-  },
-  hoaText: {
+  welcome: {
     fontSize: 12,
-    color: '#6b7280',
+    fontWeight: '800',
+    color: colors.textMuted,
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
   },
-  section: {
-    marginBottom: 16,
+  email: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: colors.text,
+    marginTop: 6,
+  },
+  metaRow: {
+    marginTop: spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    flexWrap: 'wrap',
+  },
+  metaPill: {
+    backgroundColor: colors.surfaceMuted,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    color: colors.accent,
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  metaText: {
+    fontSize: 13,
+    color: colors.textMuted,
+    fontWeight: '700',
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1f2937',
-    marginBottom: 12,
-  },
-  primaryButton: {
-    backgroundColor: '#2563eb',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-  primaryButtonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 4,
-  },
-  secondaryButton: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 2,
-    borderColor: '#e5e7eb',
-  },
-  secondaryButtonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1f2937',
-    marginBottom: 4,
-  },
-  adminButton: {
-    backgroundColor: '#10b981',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-  },
-  adminButtonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 4,
-  },
-  buttonSubtext: {
+    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
     fontSize: 14,
-    color: '#6b7280',
+    fontWeight: '900',
+    color: colors.text,
   },
-  educationCard: {
-    backgroundColor: '#fef3c7',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 2,
-    borderColor: '#fbbf24',
+  cardBtn: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: spacing.sm,
   },
-  educationTitle: {
+  cardBtnPrimary: {
+    borderColor: colors.accent,
+    backgroundColor: colors.surfaceElevated,
+  },
+  cardBtnAdmin: {
+    borderColor: colors.success,
+    backgroundColor: 'rgba(74, 222, 128, 0.08)',
+  },
+  cardBtnTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#92400e',
-    marginBottom: 12,
+    fontWeight: '900',
+    color: colors.text,
   },
-  pricingList: {
-    marginBottom: 12,
+  cardBtnSub: {
+    marginTop: 6,
+    fontSize: 13,
+    lineHeight: 18,
+    color: colors.textMuted,
+    fontWeight: '700',
   },
-  pricingItem: {
+  infoCard: {
+    marginTop: spacing.md,
+    backgroundColor: 'rgba(56, 189, 248, 0.08)',
+    borderRadius: radius.lg,
+    padding: spacing.lg,
+    borderWidth: 1,
+    borderColor: colors.accent,
+  },
+  infoTitle: {
     fontSize: 14,
-    color: '#78350f',
-    marginBottom: 4,
+    fontWeight: '900',
+    color: colors.text,
+    marginBottom: spacing.sm,
   },
-  educationFooter: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#92400e',
+  infoItem: {
+    fontSize: 13,
+    color: colors.text,
+    marginBottom: 6,
+    fontWeight: '700',
   },
   warningCard: {
-    backgroundColor: '#fee2e2',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 2,
-    borderColor: '#f87171',
+    marginTop: spacing.md,
+    backgroundColor: 'rgba(250, 204, 21, 0.08)',
+    borderRadius: radius.lg,
+    padding: spacing.lg,
+    borderWidth: 1,
+    borderColor: colors.warning,
   },
   warningTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#991b1b',
-    marginBottom: 12,
+    fontSize: 14,
+    fontWeight: '900',
+    color: colors.warning,
+    marginBottom: spacing.sm,
   },
   warningItem: {
-    fontSize: 14,
-    color: '#7f1d1d',
-    marginBottom: 4,
+    fontSize: 13,
+    color: colors.text,
+    marginBottom: 6,
+    fontWeight: '700',
   },
-  logoutButton: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 12,
-    alignItems: 'center',
+  logoutBtn: {
+    marginTop: spacing.lg,
+    height: 48,
+    borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surfaceMuted,
   },
-  logoutButtonText: {
+  logoutText: {
+    color: colors.textMuted,
+    fontWeight: '800',
     fontSize: 14,
-    color: '#6b7280',
   },
 });

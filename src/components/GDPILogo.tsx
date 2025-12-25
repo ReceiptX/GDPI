@@ -11,7 +11,7 @@ export function GDPILogo({ size = 48, showWordmark = true }: Props) {
 
   return (
     <View style={styles.row}>
-      <View style={[styles.mark, { width: size, height: size, borderRadius: r, backgroundColor: colors.brandNavy }]}>
+      <View style={[styles.mark, { width: size, height: size, borderRadius: r, backgroundColor: colors.surfaceElevated }]}>
         <View
           style={{
             position: "absolute",
@@ -31,7 +31,7 @@ export function GDPILogo({ size = 48, showWordmark = true }: Props) {
             top: Math.round(size * 0.44),
             width: Math.round(size * 0.42),
             height: Math.round(size * 0.16),
-            backgroundColor: colors.brandNavy,
+            backgroundColor: colors.surface,
             borderRadius: Math.round(size * 0.08),
           }}
         />
@@ -42,7 +42,7 @@ export function GDPILogo({ size = 48, showWordmark = true }: Props) {
             bottom: 0,
             width: size,
             height: Math.round(size * 0.32),
-            backgroundColor: colors.brandTealSoft,
+            backgroundColor: colors.accentSoft,
           }}
         />
       </View>
@@ -61,6 +61,6 @@ const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center" },
   mark: { overflow: "hidden" },
   wordmark: { marginLeft: 12 },
-  title: { fontSize: 20, fontWeight: "800", color: colors.brandNavy, letterSpacing: 0.5 },
-  subtitle: { marginTop: 2, fontSize: 12, color: colors.muted },
+  title: { fontSize: 20, fontWeight: "800", color: colors.text, letterSpacing: 0.5 },
+  subtitle: { marginTop: 2, fontSize: 12, color: colors.textMuted },
 });

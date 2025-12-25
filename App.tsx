@@ -4,6 +4,7 @@ import { ActivityIndicator, View, StyleSheet } from 'react-native';
 import AppNavigator from './src/navigation/AppNavigator';
 import { User } from './src/types';
 import { StorageService } from './src/services/storage';
+import { colors } from './src/utils/theme';
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -39,14 +40,14 @@ export default function App() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#2563eb" />
+        <ActivityIndicator size="large" color={colors.accent} />
       </View>
     );
   }
 
   return (
     <>
-      <StatusBar style="auto" />
+      <StatusBar style="light" />
       <AppNavigator user={user} onLogin={handleLogin} onLogout={handleLogout} />
     </>
   );
@@ -57,6 +58,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f3f4f6',
+    backgroundColor: colors.bg,
   },
 });

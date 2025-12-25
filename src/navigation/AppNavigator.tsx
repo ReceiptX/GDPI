@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { User } from '../types';
 import { telemetry } from '../services/telemetry';
+import { colors } from '../utils/theme';
 
 // Import screens (will be created)
 import LoginScreen from '../screens/LoginScreen';
@@ -63,12 +64,17 @@ export default function AppNavigator({ user, onLogin, onLogout }: AppNavigatorPr
         initialRouteName={user ? 'Home' : 'Login'}
         screenOptions={{
           headerStyle: {
-            backgroundColor: '#2563eb',
+            backgroundColor: colors.surface,
           },
-          headerTintColor: '#fff',
+          headerTintColor: colors.text,
           headerTitleStyle: {
-            fontWeight: 'bold',
+            fontWeight: '700',
+            color: colors.text,
           },
+          contentStyle: {
+            backgroundColor: colors.bg,
+          },
+          headerShadowVisible: false,
         }}
       >
         {!user ? (
