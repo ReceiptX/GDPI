@@ -20,10 +20,10 @@
      - **Admin Email**: Your email address
      - **Billing Email**: (Optional) Leave blank to use admin email
 
-3. **Choose Your Subscription**
-   - **14-Day Free Trial**: Try all features, no credit card required
-   - **Basic ($29/month)**: All features for small-medium HOAs
-   - **Premium ($79/month)**: Priority support + advanced analytics
+3. **Lock Your Founding Rate**
+   - Early access rate: **$1.99/month**
+   - Rate is locked for **5 years** from registration
+   - Every future GDPI feature is included during the lock
 
 4. **Save Your Credentials**
    - After registration, you'll receive:
@@ -38,11 +38,11 @@
 
 #### Option 2: Manual Setup by Owner
 
-Contact support@receiptx.com with:
+Contact [support@receiptx.com](mailto:support@receiptx.com) with:
 - HOA Name
 - Admin Name and Email
 - Approximate number of units
-- Preferred subscription tier
+- Billing contact (for the $1.99/month founding rate lock)
 
 We'll set up your account and send credentials within 24 hours.
 
@@ -66,16 +66,14 @@ const registration = {
   hoaName: 'New HOA Community',
   adminEmail: 'admin@newhoa.com',
   adminName: 'John Smith',
-  billingEmail: 'billing@newhoa.com', // Optional
-  subscriptionTier: 'trial', // or 'basic', 'premium'
-  trialDays: 14,
 };
 
 const result = await StorageService.registerHOA(registration);
 
 if (result.success) {
-  console.log(`Admin PIN: ${result.adminPin}`);
-  // Send credentials to admin via email
+   console.log(`Admin PIN: ${result.adminPin}`);
+   console.log(`Founding rate lock expires: ${result.plan?.lockExpires}`);
+   // Send credentials + lock confirmation via email
 }
 ```
 
@@ -84,9 +82,8 @@ if (result.success) {
 If you've implemented a backend API:
 
 ```sql
--- Create HOA record
-INSERT INTO hoas (hoa_id, hoa_name, subscription_tier, trial_expires_at)
-VALUES ('newhoaid', 'New HOA', 'trial', NOW() + INTERVAL '14 days');
+INSERT INTO hoas (hoa_id, hoa_name, locked_price_usd, lock_expires_at)
+VALUES ('newhoaid', 'New HOA', 1.99, NOW() + INTERVAL '5 years');
 
 -- Create admin user
 INSERT INTO residents (email, pin_hash, hoa_id, role, created_at)
@@ -97,7 +94,7 @@ VALUES ('admin@newhoa.com', hash('1234'), 'newhoaid', 'admin', NOW());
 
 ## Managing Residents
 
-### As HOA Admin:
+### As HOA Admin
 
 1. **Login to the app**
 2. **Navigate to "Manage Residents"** (admin-only screen)
@@ -127,107 +124,84 @@ VALUES ('admin@newhoa.com', hash('1234'), 'newhoaid', 'admin', NOW());
 
 ---
 
-## Subscription Management
+## Founding Rate & Billing
 
-### Current Tiers
+### Early Access Plan
 
-| Tier | Price | Features | Best For |
-|------|-------|----------|----------|
-| **Trial** | Free (14 days) | All features | Testing the platform |
-| **Basic** | $29/month | Unlimited residents, AI analysis, community data | Small-medium HOAs |
-| **Premium** | $79/month | Basic + priority support + advanced analytics | Large HOAs, enterprise |
+| Plan | Price | Lock Length | Includes |
+| --- | --- | --- | --- |
+| Early Access Lock | $1.99 per month | 5 years (60 months) | Unlimited residents, AI analysis, neighborhood pricing, admin tools, red-flag detection, and every future GDPI service released during the lock |
 
-### Trial Period
+### How the Lock Works
 
-- **Duration:** 14 days from registration
-- **Features:** Full access to all features
-- **No Credit Card:** Required to start trial
-- **Expiration:** App will notify 3 days before trial ends
+- **Price assurance:** Your HOA is billed $1.99/month for the entire 5-year term.
+- **Future services:** Anything we ship during the lock (new dashboards, data connectors, etc.) is included at no additional cost.
+- **No seat limits:** Invite the whole neighborhood—there are no per-resident or per-admin fees.
+- **Continuity:** If you reinstall the app or migrate devices, the stored subscription record re-applies the lock automatically.
 
-### Upgrading from Trial
+### Checking Your Status
 
-**Option A: In-App Purchase (When Implemented)**
-1. Admin logs in
-2. Navigates to "Subscription" (in settings)
-3. Chooses Basic or Premium
-4. Completes payment
+- Registration confirmations include the lock expiration date.
+- Upcoming releases will surface the lock date on the admin home screen.
+- Email [support@receiptx.com](mailto:support@receiptx.com) with your HOA ID for an immediate status check.
 
-**Option B: Contact Support**
-Email support@receiptx.com with:
-- HOA ID
-- Desired tier (Basic/Premium)
-- Billing email
+### Making Changes During the Lock
 
-We'll send a payment link and upgrade your account upon payment.
+- **Billing contact:** Email support with the HOA ID and new billing contact to update invoices.
+- **Payment method:** Provide verification details plus the HOA ID; we'll send a secure link to update the card/ACH info.
+- **Service questions:** Since new modules are included, there is nothing to approve—just start using them.
 
-### Subscription Status
+### After 5 Years
 
-Check your subscription:
-- Login attempt shows trial days remaining
-- Expired subscriptions block access
-- App displays current tier on home screen
+- We reach out 90 days before the lock ends with renewal options.
+- You can renew at a loyalty rate that never exceeds our public price at that time.
+- If you opt not to renew, GDPI will pause on the lock expiration date until a new plan is selected.
 
 ---
 
 ## Payment Methods
 
-### Accepted Payment Methods
+- Credit/debit cards (Visa, MasterCard, Amex, Discover)
+- ACH/bank transfer for HOAs preferring invoicing
+- Purchase orders for municipalities or master associations
 
-- Credit/Debit Cards (Visa, MasterCard, Amex, Discover)
-- ACH/Bank Transfer (for annual plans)
-- Purchase Orders (for Premium tier with annual commitment)
-
-### Billing
-
-- **Monthly:** Charged on the same day each month
-- **Annual:** 2 months free (10 months price for 12 months)
-- **Cancellation:** Cancel anytime, prorated refund for annual plans
+Early-access billing is processed manually today via a secure payment link. Automated in-app billing arrives after we exit early access.
 
 ---
 
 ## HOA Administrator FAQ
 
 ### Q: How do I add multiple residents at once?
-**A:** Currently, residents must be added individually through the app. For bulk imports, contact support@receiptx.com with a CSV file (email, name).
+
+**A:** Email a CSV (email, name) to [support@receiptx.com](mailto:support@receiptx.com). We will import it within one business day.
 
 ### Q: Can residents see each other's information?
-**A:** No. Residents only see:
-- Their own login information
-- Anonymized community pricing data (no names/emails)
-- Arizona baseline pricing
+
+**A:** No. Residents only see anonymized neighborhood pricing trends plus their own quotes.
 
 ### Q: What if a resident forgets their PIN?
-**A:** Admin can rotate the PIN:
-1. Go to "Manage Residents"
-2. Find the resident
-3. Tap "Rotate PIN"
-4. Share the new PIN with them
+
+**A:** In **Manage Residents**, tap the profile, choose **Rotate PIN**, and share the new code.
 
 ### Q: Can I have multiple admins?
-**A:** Yes! When adding a resident, you can assign them the "admin" role. They'll have full admin capabilities.
 
-### Q: What happens when my trial expires?
-**A:** 
-- 3 days before: Warning on login
-- On expiration: Login blocked with upgrade message
-- Data preserved: Your quote history is saved
-- Upgrade anytime: Contact support to reactivate
+**A:** Yes. Set the resident's role to `admin` and they gain full admin privileges immediately.
 
-### Q: How do I cancel my subscription?
-**A:** Email support@receiptx.com with your HOA ID. We'll process cancellation and confirm via email. Annual subscriptions receive prorated refunds.
+### Q: What happens after the 5-year lock?
+
+**A:** Ninety days prior, we send renewal options. If no decision is made, the account pauses on the lock end date but all data stays intact.
+
+### Q: How do I cancel?
+
+**A:** Email [support@receiptx.com](mailto:support@receiptx.com) with your HOA ID. We'll confirm the effective date (typically end of the current billing month).
 
 ### Q: Is my data private?
-**A:** Yes! 
-- Quote history is anonymized (no names/emails stored)
-- Each HOA's data is completely isolated
-- PINs are cryptographically generated and secured
-- We never share data with third parties
+
+**A:** Yes. Quote data is siloed per HOA, PINs are generated with `expo-crypto`, and nothing is shared with third parties without your explicit request.
 
 ### Q: What if I need help?
-**A:**
-- Email: support@receiptx.com
-- Response time: < 24 hours (Basic), < 4 hours (Premium)
-- Include your HOA ID in all support requests
+
+**A:** Early-access customers receive 24-hour weekday response times. Include your HOA ID in every ticket for faster routing.
 
 ---
 
@@ -278,12 +252,14 @@ Check your subscription:
 
 **Q: Do other residents see my quotes?**
 **A:** No. All quotes are anonymized. Other residents see:
+
 - Date (not specific time)
 - Job type (e.g., "Torsion springs")
 - Amount
 - Verdict (Green/Yellow/Red)
 
 They don't see:
+
 - Your name
 - Your email
 - Your address
@@ -292,6 +268,7 @@ They don't see:
 
 **Q: How accurate is the AI analysis?**
 **A:** GDPI uses Arizona-specific baseline pricing and detects:
+
 - Prices outside normal ranges
 - Duplicate charges
 - Vague warranties
@@ -308,31 +285,34 @@ Always use GDPI as a guide, and get multiple quotes for major work.
 ## Success Stories
 
 ### Example: Sunset Village HOA
+
 - **Size:** 85 units
-- **Tier:** Basic ($29/month)
-- **Results:** 
-  - Caught 3 overpriced quotes (avg $400 savings)
-  - 73% of residents using the app
-  - $2,100 saved in first quarter
-  - ROI: 2,400% (saved $696 vs $29 cost)
+- **Plan:** Early Access Lock ($1.99/month)
+- **Results:**
+   - Caught 3 overpriced quotes (avg $400 savings)
+   - 73% resident adoption in the first quarter
+   - $2,100 saved while paying ~$24 during the same period
 
 ---
 
 ## Contact & Support
 
 **Platform Owner:**
-- Email: support@receiptx.com
-- Response time: 24 hours (Basic), 4 hours (Premium)
+
+- Email: [support@receiptx.com](mailto:support@receiptx.com)
+- Early-access response: 24 hours on business days
 
 **Sales Inquiries:**
-- Email: sales@receiptx.com
-- For HOAs with 200+ units, custom pricing available
+
+- Email: [sales@receiptx.com](mailto:sales@receiptx.com)
+- For HOAs with 200+ units, custom pricing is available
 
 **Technical Issues:**
-- Email: support@receiptx.com
-- Include: HOA ID, device type, screenshot if possible
+
+- Email: [support@receiptx.com](mailto:support@receiptx.com)
+- Include: HOA ID, device type, and screenshots when possible
 
 ---
 
-*Last Updated: December 23, 2025*
-*Version: 1.0.0*
+*Last Updated: December 24, 2025*
+*Version: 1.1.0*
