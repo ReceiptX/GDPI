@@ -1,36 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GDPI Marketing Website (Next.js)
+
+This folder contains the public, SEO-friendly marketing site for GDPI (pricing, how it works, Arizona Price Index, request demo, security/privacy).
+
+The **AI quote analysis experience currently lives in the Expo mobile app at the repo root** (not in this website).
 
 ## Getting Started
 
-First, run the development server:
+Install dependencies from this folder:
+
+```bash
+npm install
+```
+
+Run the dev server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Pages live in `src/app/*` (App Router). The dev server auto-updates as you edit files.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+## Notes
 
-To learn more about Next.js, take a look at the following resources:
+- Some premium “proof check” details (e.g., balance-test steps) are intentionally not shown on public pages.
+- If you want a gated web analyzer, add auth/subscription + a protected “Analyze Quote” route and server-side API calls.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Next.js docs: <https://nextjs.org/docs>

@@ -4,6 +4,14 @@
 
 GDPI is a multi-tenant SaaS platform for Arizona HOAs and homeowners that uses AI to analyze garage door service quotes, detect pricing red flags, and provide educational context around fair market rates.
 
+## Marketing website vs. the app
+
+- **Mobile app (this repo root)**: The AI quote analyzer lives in the Expo app.
+  - Key files: `src/screens/AIQuoteAnalysisScreen.tsx`, `src/services/ai.ts` (AI), `src/services/ocr.ts` (photo → text).
+- **Marketing website**: A separate Next.js site lives in `website/`.
+  - It is currently a public, SEO-friendly marketing site (pricing, how-it-works, Arizona Price Index, request-demo).
+  - It does **not** currently run the AI analysis UI; if you want quote analysis on web, we can build a web app route in Next.js (and gate it behind subscription/auth).
+
 ## Features
 
 - **AI-Powered Quote Analysis**: Upload or paste quotes for instant analysis with verdict, price context, and red flags
@@ -66,7 +74,7 @@ cp .env.example .env
 
 Edit `.env` and add your Groq API key:
 
-```
+```env
 GROQ_API_KEY=gsk_your-actual-groq-api-key-here
 APP_ROLE_DEFAULT=homeowner
 OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318/v1/traces
@@ -84,6 +92,16 @@ npm start
 npx expo start -c
 ```
 
+## Running the marketing website (Next.js)
+
+From the repo root:
+
+```bash
+cd website
+npm install
+npm run dev
+```
+
 ### 5. Run on Device/Emulator
 
 - **iOS Simulator**: Press `i` in the terminal
@@ -97,16 +115,18 @@ The app comes with demo data for testing:
 **HOA ID**: `hoa001`
 
 **Admin User**:
+
 - Email: `admin@hoa001.com`
 - PIN: `1234`
 
 **Resident User**:
+
 - Email: `resident@hoa001.com`
 - PIN: `5678`
 
 ## Project Structure
 
-```
+```text
 GDPI/
 ├── App.tsx                      # Main app entry point
 ├── app.json                     # Expo configuration
@@ -137,7 +157,7 @@ GDPI/
 ### For Residents
 
 1. **Login**: Enter your HOA ID, email, and PIN
-2. **Analyze Quote**: 
+2. **Analyze Quote**:
    - Choose "AI Analyze My Quote" to paste a written quote
    - Or choose "Manual Entry" to enter parts and labor costs
 3. **Review Results**: See verdict (green/yellow/red), price context, red flags, and questions to ask
@@ -146,7 +166,7 @@ GDPI/
 ### For HOA Admins
 
 1. **Login**: Use your admin credentials
-2. **Manage Residents**: 
+2. **Manage Residents**:
    - Navigate to "Manage Residents"
    - Add new residents (auto-generates secure PINs)
    - Rotate PINs for security
@@ -271,8 +291,9 @@ MIT License - see LICENSE file for details
 ## Support
 
 For issues and questions:
+
 - Open a GitHub issue
-- Contact: support@receiptx.com
+- Contact: <support@receiptx.com>
 
 ## Acknowledgments
 
