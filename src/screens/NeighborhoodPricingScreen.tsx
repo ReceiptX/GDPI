@@ -11,7 +11,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { User, Quote } from '../types';
 import { StorageService } from '../services/storage';
 import { telemetry } from '../services/telemetry';
-import { colors } from '../utils/theme';
+import { colors, fonts } from '../utils/theme';
 
 type NeighborhoodPricingScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
   },
   emptyStateTitle: {
     fontSize: 20,
-    fontWeight: '800',
+    fontFamily: fonts.headingStrong,
     color: colors.text,
     marginBottom: 8,
   },
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
   },
   statsTitle: {
     fontSize: 18,
-    fontWeight: '800',
+    fontFamily: fonts.headingStrong,
     color: colors.text,
     marginBottom: 16,
   },
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: 24,
-    fontWeight: '800',
+    fontFamily: fonts.heading,
     color: colors.accent,
   },
   statLabel: {
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '800',
+    fontFamily: fonts.headingStrong,
     color: colors.text,
     marginBottom: 12,
   },
@@ -329,12 +329,12 @@ const styles = StyleSheet.create({
   },
   verdictText: {
     fontSize: 10,
-    fontWeight: '800',
+    fontFamily: fonts.bodyStrong,
     color: '#fff',
   },
   quoteJobType: {
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: fonts.headingStrong,
     color: colors.text,
     marginBottom: 8,
   },
@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
   },
   quoteAmount: {
     fontSize: 20,
-    fontWeight: '800',
+    fontFamily: fonts.heading,
     color: colors.accentAlt,
     marginTop: 8,
   },
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
   },
   educationTitle: {
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: fonts.headingStrong,
     color: colors.text,
     marginBottom: 12,
   },

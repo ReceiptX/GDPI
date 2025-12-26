@@ -1,6 +1,6 @@
 ﻿import React from "react";
 import { View, StyleSheet, Text } from "react-native";
-import { colors } from "../utils/theme";
+import { colors, fonts } from "../utils/theme";
 
 type Props = { size?: number; showWordmark?: boolean };
 
@@ -61,6 +61,6 @@ const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center" },
   mark: { overflow: "hidden" },
   wordmark: { marginLeft: 12 },
-  title: { fontSize: 20, fontWeight: "800", color: colors.text, letterSpacing: 0.5 },
-  subtitle: { marginTop: 2, fontSize: 12, color: colors.textMuted },
+  title: { fontSize: 20, fontFamily: fonts.heading, color: colors.text, letterSpacing: 0.5 },
+  subtitle: { marginTop: 2, fontSize: 12, fontFamily: fonts.bodyStrong, color: colors.textMuted },
 });

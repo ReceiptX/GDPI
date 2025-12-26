@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { StorageService } from '../services/storage';
 import { telemetry } from '../services/telemetry';
-import { colors, spacing, radius } from '../utils/theme';
+import { colors, spacing, radius, fonts } from '../utils/theme';
 
 interface LoginScreenProps {
   onLogin: (user: any) => void;
@@ -127,13 +127,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 38,
-    fontWeight: '900',
+    fontFamily: fonts.heading,
     color: colors.text,
   },
   subtitle: {
     marginTop: 6,
     fontSize: 14,
-    fontWeight: '800',
+    fontFamily: fonts.bodyStrong,
     color: colors.accent,
     letterSpacing: 0.7,
     textTransform: 'uppercase',
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
     fontSize: 14,
     lineHeight: 20,
-    fontWeight: '700',
+    fontFamily: fonts.body,
     color: colors.textMuted,
   },
   form: {
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     marginBottom: 8,
     fontSize: 13,
-    fontWeight: '800',
+    fontFamily: fonts.bodyStrong,
     color: colors.text,
   },
   input: {
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     paddingHorizontal: 12,
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: fonts.body,
     backgroundColor: colors.surfaceMuted,
     color: colors.text,
   },
@@ -182,12 +182,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonDisabled: {
-    backgroundColor: 'rgba(56, 189, 248, 0.35)',
+    backgroundColor: 'rgba(59, 130, 246, 0.35)',
   },
   buttonText: {
     color: colors.text,
     fontSize: 14,
-    fontWeight: '900',
+    fontFamily: fonts.bodyBold,
   },
   registerLink: {
     marginTop: spacing.md,
@@ -196,13 +196,13 @@ const styles = StyleSheet.create({
   },
   registerLinkText: {
     fontSize: 14,
-    fontWeight: '800',
+    fontFamily: fonts.bodyStrong,
     color: colors.accent,
   },
   footer: {
     marginTop: spacing.md,
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: fonts.body,
     color: colors.textMuted,
     textAlign: 'center',
   },

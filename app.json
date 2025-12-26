@@ -5,11 +5,11 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#070B16"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -25,7 +25,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#070B16"
       },
       "permissions": [
         "CAMERA",
@@ -44,6 +44,9 @@
         "projectId": "409a685a-0eb7-4438-ad82-d9350738dc0d"
       }
     },
-    "owner": "garagedoorpricingindex"
+    "owner": "garagedoorpricingindex",
+    "plugins": [
+      "expo-font"
+    ]
   }
 }

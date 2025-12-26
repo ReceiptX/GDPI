@@ -13,6 +13,7 @@ import { StorageService } from '../services/storage';
 import { HOARegistration } from '../types';
 import { colors } from '../utils/theme';
 import { EARLY_ACCESS_PLAN, formatCurrency, formatLockExpiration } from '../utils/subscription';
+import { fonts } from '../utils/theme';
 
 interface HOARegistrationScreenProps {
   onRegistrationComplete: () => void;
@@ -213,7 +214,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontWeight: '800',
+    fontFamily: fonts.heading,
     color: colors.text,
     marginBottom: 8,
   },
@@ -246,19 +247,19 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceMuted,
     color: colors.accent,
     fontSize: 12,
-    fontWeight: '800',
+    fontFamily: fonts.bodyStrong,
     letterSpacing: 0.5,
     marginBottom: 8,
   },
   planPrice: {
     fontSize: 36,
-    fontWeight: '900',
+    fontFamily: fonts.heading,
     color: colors.text,
   },
   planPriceInterval: {
     fontSize: 16,
     color: colors.textMuted,
-    fontWeight: '700',
+    fontFamily: fonts.body,
   },
   planLock: {
     fontSize: 14,
@@ -276,14 +277,14 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '800',
+    fontFamily: fonts.headingStrong,
     color: colors.text,
     marginTop: 16,
     marginBottom: 12,
   },
   label: {
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: fonts.bodyStrong,
     color: colors.text,
     marginBottom: 8,
     marginTop: 12,
@@ -312,7 +313,7 @@ const styles = StyleSheet.create({
   },
   infoTitle: {
     fontSize: 14,
-    fontWeight: '800',
+    fontFamily: fonts.headingStrong,
     color: colors.text,
     marginBottom: 8,
   },
@@ -331,15 +332,16 @@ const styles = StyleSheet.create({
     borderColor: colors.accent,
   },
   registerButtonDisabled: {
-    backgroundColor: 'rgba(56, 189, 248, 0.35)',
+    backgroundColor: 'rgba(59, 130, 246, 0.35)',
   },
   registerButtonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: fonts.bodyStrong,
   },
   footer: {
     fontSize: 12,
+    fontFamily: fonts.body,
     color: colors.textMuted,
     textAlign: 'center',
     marginTop: 12,

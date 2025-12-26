@@ -7,7 +7,7 @@ import { OCRService } from '../services/ocr';
 import { StorageService } from '../services/storage';
 import { telemetry } from '../services/telemetry';
 import config from '../utils/config';
-import { colors, spacing, radius } from '../utils/theme';
+import { colors, spacing, radius, fonts } from '../utils/theme';
 
 interface AIQuoteAnalysisScreenProps {
   user: User;
@@ -576,13 +576,13 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 18,
     color: colors.textMuted,
-    fontWeight: '700',
+    fontFamily: fonts.body,
   },
   label: {
     marginTop: spacing.md,
     marginBottom: 8,
     fontSize: 13,
-    fontWeight: '900',
+    fontFamily: fonts.bodyStrong,
     color: colors.text,
   },
   input: {
@@ -594,7 +594,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceMuted,
     color: colors.text,
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: fonts.body,
   },
   ocrRow: {
     flexDirection: 'row',
@@ -617,14 +617,14 @@ const styles = StyleSheet.create({
   ocrBtnText: {
     color: colors.text,
     fontSize: 13,
-    fontWeight: '900',
+    fontFamily: fonts.bodyBold,
   },
   hint: {
     marginTop: 8,
     fontSize: 12,
     lineHeight: 16,
     color: colors.textMuted,
-    fontWeight: '700',
+    fontFamily: fonts.body,
   },
   warningCard: {
     marginTop: spacing.sm,
@@ -637,7 +637,7 @@ const styles = StyleSheet.create({
   },
   warningTitle: {
     fontSize: 13,
-    fontWeight: '900',
+    fontFamily: fonts.headingStrong,
     color: colors.warning,
     marginBottom: 8,
   },
@@ -645,7 +645,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.text,
     marginBottom: 6,
-    fontWeight: '700',
+    fontFamily: fonts.body,
   },
   textArea: {
     minHeight: 170,
@@ -656,7 +656,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceMuted,
     color: colors.text,
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: fonts.body,
   },
   checkboxGroup: {
     backgroundColor: colors.surface,
@@ -689,12 +689,12 @@ const styles = StyleSheet.create({
   checkboxCheck: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: '900',
+    fontFamily: fonts.bodyBold,
   },
   checkboxLabel: {
     fontSize: 15,
     color: colors.text,
-    fontWeight: '800',
+    fontFamily: fonts.bodyStrong,
   },
   segmented: {
     flexDirection: 'row',
@@ -716,7 +716,7 @@ const styles = StyleSheet.create({
   },
   segmentText: {
     color: colors.textMuted,
-    fontWeight: '800',
+    fontFamily: fonts.bodyStrong,
     fontSize: 13,
   },
   segmentTextSelected: {
@@ -733,12 +733,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   analyzeBtnDisabled: {
-    backgroundColor: 'rgba(56, 189, 248, 0.35)',
+    backgroundColor: 'rgba(59, 130, 246, 0.35)',
   },
   analyzeBtnText: {
     color: colors.text,
     fontSize: 14,
-    fontWeight: '900',
+    fontFamily: fonts.bodyBold,
   },
   resultCard: {
     marginTop: spacing.lg,
@@ -756,7 +756,7 @@ const styles = StyleSheet.create({
   },
   verdictText: {
     fontSize: 12,
-    fontWeight: '900',
+    fontFamily: fonts.bodyBold,
     color: colors.bg,
     letterSpacing: 0.6,
   },
@@ -765,7 +765,7 @@ const styles = StyleSheet.create({
   },
   resultTitle: {
     fontSize: 12,
-    fontWeight: '900',
+    fontFamily: fonts.bodyStrong,
     color: colors.accent,
     textTransform: 'uppercase',
     letterSpacing: 0.7,
@@ -775,25 +775,25 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
     color: colors.text,
-    fontWeight: '700',
+    fontFamily: fonts.body,
   },
   resultMuted: {
     fontSize: 13,
     lineHeight: 18,
     color: colors.textMuted,
-    fontWeight: '700',
+    fontFamily: fonts.body,
   },
   resultItem: {
     fontSize: 13,
     lineHeight: 18,
     color: colors.text,
-    fontWeight: '700',
+    fontFamily: fonts.body,
     marginBottom: 6,
   },
   savedNote: {
     marginTop: spacing.md,
     fontSize: 12,
-    fontWeight: '800',
+    fontFamily: fonts.bodyStrong,
     color: colors.textMuted,
   },
 });

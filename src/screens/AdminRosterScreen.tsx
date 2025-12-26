@@ -14,7 +14,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { User, Resident } from '../types';
 import { StorageService } from '../services/storage';
 import { telemetry } from '../services/telemetry';
-import { colors } from '../utils/theme';
+import { colors, fonts } from '../utils/theme';
 
 type AdminRosterScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -344,13 +344,13 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '800',
+    fontFamily: fonts.headingStrong,
     color: colors.text,
     marginBottom: 16,
   },
   label: {
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: fonts.bodyStrong,
     color: colors.text,
     marginBottom: 8,
     marginTop: 12,
@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
   addButtonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: fonts.bodyStrong,
   },
   rosterSection: {
     marginBottom: 24,
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
   },
   residentEmail: {
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: fonts.bodyBold,
     color: colors.text,
     marginBottom: 4,
   },
@@ -432,10 +432,10 @@ const styles = StyleSheet.create({
   actionButtonText: {
     fontSize: 12,
     color: colors.accent,
-    fontWeight: '700',
+    fontFamily: fonts.bodyStrong,
   },
   removeButton: {
-    backgroundColor: 'rgba(248, 113, 113, 0.15)',
+    backgroundColor: 'rgba(251, 113, 133, 0.15)',
     borderColor: colors.danger,
   },
   removeButtonText: {
@@ -450,7 +450,7 @@ const styles = StyleSheet.create({
   },
   infoTitle: {
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: fonts.headingStrong,
     color: colors.text,
     marginBottom: 12,
   },

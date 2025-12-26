@@ -4,7 +4,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { User } from '../types';
 import { StorageService } from '../services/storage';
-import { colors, spacing, radius } from '../utils/theme';
+import { colors, spacing, radius, fonts } from '../utils/theme';
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
@@ -100,14 +100,14 @@ const styles = StyleSheet.create({
   },
   welcome: {
     fontSize: 12,
-    fontWeight: '800',
+    fontFamily: fonts.bodyStrong,
     color: colors.textMuted,
     letterSpacing: 0.8,
     textTransform: 'uppercase',
   },
   email: {
     fontSize: 20,
-    fontWeight: '900',
+    fontFamily: fonts.heading,
     color: colors.text,
     marginTop: 6,
   },
@@ -127,18 +127,18 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     color: colors.accent,
     fontSize: 12,
-    fontWeight: '800',
+    fontFamily: fonts.bodyStrong,
   },
   metaText: {
     fontSize: 13,
     color: colors.textMuted,
-    fontWeight: '700',
+    fontFamily: fonts.body,
   },
   sectionTitle: {
     marginTop: spacing.lg,
     marginBottom: spacing.sm,
     fontSize: 14,
-    fontWeight: '900',
+    fontFamily: fonts.headingStrong,
     color: colors.text,
   },
   cardBtn: {
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
   },
   cardBtnTitle: {
     fontSize: 16,
-    fontWeight: '900',
+    fontFamily: fonts.headingStrong,
     color: colors.text,
   },
   cardBtnSub: {
@@ -167,11 +167,11 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 18,
     color: colors.textMuted,
-    fontWeight: '700',
+    fontFamily: fonts.body,
   },
   infoCard: {
     marginTop: spacing.md,
-    backgroundColor: 'rgba(56, 189, 248, 0.08)',
+    backgroundColor: 'rgba(34, 211, 238, 0.08)',
     borderRadius: radius.lg,
     padding: spacing.lg,
     borderWidth: 1,
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
   },
   infoTitle: {
     fontSize: 14,
-    fontWeight: '900',
+    fontFamily: fonts.headingStrong,
     color: colors.text,
     marginBottom: spacing.sm,
   },
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.text,
     marginBottom: 6,
-    fontWeight: '700',
+    fontFamily: fonts.body,
   },
   warningCard: {
     marginTop: spacing.md,
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
   },
   warningTitle: {
     fontSize: 14,
-    fontWeight: '900',
+    fontFamily: fonts.headingStrong,
     color: colors.warning,
     marginBottom: spacing.sm,
   },
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.text,
     marginBottom: 6,
-    fontWeight: '700',
+    fontFamily: fonts.body,
   },
   logoutBtn: {
     marginTop: spacing.lg,
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
   },
   logoutText: {
     color: colors.textMuted,
-    fontWeight: '800',
+    fontFamily: fonts.bodyStrong,
     fontSize: 14,
   },
 });

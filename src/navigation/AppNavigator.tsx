@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { User } from '../types';
 import { telemetry } from '../services/telemetry';
-import { colors } from '../utils/theme';
+import { colors, fonts } from '../utils/theme';
 
 // Import screens (will be created)
 import LoginScreen from '../screens/LoginScreen';
@@ -65,7 +65,7 @@ export default function AppNavigator({ user, onLogin, onLogout }: AppNavigatorPr
           },
           headerTintColor: colors.text,
           headerTitleStyle: {
-            fontWeight: '700',
+            fontFamily: fonts.headingStrong,
             color: colors.text,
           },
           contentStyle: {

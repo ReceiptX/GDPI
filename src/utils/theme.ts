@@ -23,6 +23,16 @@
 export const spacing = { xs: 8, sm: 12, md: 16, lg: 24, xl: 32 };
 export const radius = { md: 12, lg: 16, xl: 999 };
 
+// Font family keys must match the names registered by `@expo-google-fonts/*`.
+// Loaded in `App.tsx`.
+export const fonts = {
+  body: 'Inter_500Medium',
+  bodyStrong: 'Inter_600SemiBold',
+  bodyBold: 'Inter_700Bold',
+  heading: 'Sora_800ExtraBold',
+  headingStrong: 'Sora_700Bold',
+} as const;
+
 export const typography = {
   headingWeight: '800' as const,
   bodyWeight: '600' as const,
