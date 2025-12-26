@@ -16,13 +16,21 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.receiptx.gdpi"
+      "bundleIdentifier": "com.receiptx.gdpi",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Allow GDPI to use the camera to scan a quote.",
+        "NSPhotoLibraryUsageDescription": "Allow GDPI to select a quote photo for text extraction."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "permissions": [
+        "CAMERA",
+        "READ_MEDIA_IMAGES"
+      ],
       "package": "com.receiptx.gdpi"
     },
     "web": {
@@ -30,6 +38,7 @@
     },
     "extra": {
       "groqApiKey": "${GROQ_API_KEY}",
+      "ocrSpaceApiKey": "${OCRSPACE_API_KEY}",
       "otlpEndpoint": "${OTEL_EXPORTER_OTLP_ENDPOINT}",
       "eas": {
         "projectId": "409a685a-0eb7-4438-ad82-d9350738dc0d"

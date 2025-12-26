@@ -93,6 +93,8 @@ export interface ManualQuoteEntry {
 export interface BaselinePricing {
   serviceCall: [number, number];
   torsionSprings: [number, number];
+  /** Springs-only benchmark (wire size up to 0.250). Scheduled service should generally not exceed this. */
+  torsionSpringsMaxUpToWire250: number;
   rollers: [number, number];
   opener: [number, number];
   panelSwap: [number, number];

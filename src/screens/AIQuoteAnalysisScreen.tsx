@@ -1,27 +1,173 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Alert } from 'react-native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
+import * as ImagePicker from 'expo-image-picker';
 import { AIAnalysisResult, JobTiming, Quote, QuoteVerdict, User } from '../types';
 import { AIService } from '../services/ai';
+import { OCRService } from '../services/ocr';
 import { StorageService } from '../services/storage';
 import { telemetry } from '../services/telemetry';
 import config from '../utils/config';
 import { colors, spacing, radius } from '../utils/theme';
 
-type AIQuoteAnalysisScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'AIQuoteAnalysis'>;
-
 interface AIQuoteAnalysisScreenProps {
-  navigation: AIQuoteAnalysisScreenNavigationProp;
   user: User;
+  /**
+   * paste: only written quote
+   * manual: only part checklist + total cost
+   * combined: accept either/both and send both to the AI
+   */
+  entryMode?: 'paste' | 'manual' | 'combined';
 }
 
-export default function AIQuoteAnalysisScreen({ user }: AIQuoteAnalysisScreenProps) {
+export default function AIQuoteAnalysisScreen({ user, entryMode = 'combined' }: AIQuoteAnalysisScreenProps) {
   const [quoteText, setQuoteText] = useState('');
   const [timing, setTiming] = useState<JobTiming>('scheduled');
   const [doorSetup, setDoorSetup] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AIAnalysisResult | null>(null);
+
+  const [ocrLoading, setOcrLoading] = useState(false);
+  const [ocrStatus, setOcrStatus] = useState<string>('');
+  const [quotePhotoUri, setQuotePhotoUri] = useState<string | null>(null);
+
+  const [parts, setParts] = useState({
+    torsionSprings: false,
+    rollers: false,
+    hinges: false,
+    cables: false,
+    opener: false,
+    panels: false,
+    fullDoor: false,
+  });
+  const [otherParts, setOtherParts] = useState('');
+  const [totalCost, setTotalCost] = useState('');
+  const [notes, setNotes] = useState('');
+
+  const togglePart = (part: keyof typeof parts) => {
+    setParts({ ...parts, [part]: !parts[part] });
+  };
+
+  const getManualJobType = (): string => {
+    if (parts.fullDoor) return 'Full door replacement';
+    if (parts.opener) return 'Opener replacement';
+    if (parts.torsionSprings) return 'Torsion springs';
+    if (parts.panels) return 'Panel replacement';
+    if (parts.rollers) return 'Rollers';
+    const anyOther = otherParts.trim().length > 0;
+    return anyOther ? 'General service' : 'General service';
+  };
+
+  const buildManualSummaryText = (): string => {
+    const anySelected = Object.values(parts).some(Boolean);
+    const anyOther = otherParts.trim().length > 0;
+
+    let text = 'MANUAL ENTRY (homeowner-provided)\n';
+    text += 'Parts & Services:\n';
+
+    if (parts.torsionSprings) text += '- Torsion Springs (pair)\n';
+    if (parts.rollers) text += '- Rollers replacement\n';
+    if (parts.hinges) text += '- Hinges replacement\n';
+    if (parts.cables) text += '- Cables replacement\n';
+    if (parts.opener) text += '- Opener replacement\n';
+    if (parts.panels) text += '- Panel replacement\n';
+    if (parts.fullDoor) text += '- Full door replacement\n';
+    if (anyOther) text += `- ${otherParts.trim()}\n`;
+    if (!anySelected && !anyOther) text += '- (none selected)\n';
+
+    if (totalCost.trim()) {
+      text += `\nTotal Cost (parts + labor): $${totalCost.trim()}\n`;
+    }
+    if (notes.trim()) {
+      text += `\nNotes: ${notes.trim()}\n`;
+    }
+
+    return text;
+  };
+
+  const buildAnalysisInput = (): string => {
+    const hasPaste = quoteText.trim().length > 0;
+    const hasManual =
+      Object.values(parts).some(Boolean) ||
+      otherParts.trim().length > 0 ||
+      totalCost.trim().length > 0 ||
+      notes.trim().length > 0;
+
+    let text = 'Analyze this Arizona garage door service quote. Use all available info.\n\n';
+
+    if (hasPaste) {
+      text += 'ORIGINAL QUOTE TEXT:\n';
+      text += `${quoteText.trim()}\n\n`;
+    }
+
+    if (hasManual) {
+      text += `${buildManualSummaryText()}\n`;
+    }
+
+    text += 'Guidance:\n';
+    text += '- Evaluate whether the overall job price makes sense for the described work.\n';
+    text += '- If pricing is above typical, ask for a calm explanation of specs and what is included.\n';
+    text += '- If the quote text and manual entry conflict, list what to clarify.\n';
+
+    return text;
+  };
+
+  const runOcrOnUri = async (uri: string) => {
+    setOcrLoading(true);
+    setOcrStatus('Extracting text from photo…');
+    try {
+      const res = await OCRService.extractTextFromImageUri(uri);
+      setQuoteText((prev) => {
+        const next = prev.trim().length > 0 ? `${prev.trim()}\n\n${res.text}` : res.text;
+        return next;
+      });
+      setOcrStatus('Quote text added from photo.');
+    } catch (e: any) {
+      const msg = e?.message ? String(e.message) : 'OCR failed.';
+      setOcrStatus('');
+      Alert.alert('OCR failed', msg);
+    } finally {
+      setOcrLoading(false);
+    }
+  };
+
+  const handleTakeQuotePhoto = async () => {
+    const perm = await ImagePicker.requestCameraPermissionsAsync();
+    if (!perm.granted) {
+      Alert.alert('Permission needed', 'Camera permission is required to take a quote photo.');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      quality: 0.8,
+      allowsEditing: true,
+    });
+
+    if (result.canceled) return;
+    const uri = result.assets?.[0]?.uri;
+    if (!uri) return;
+    setQuotePhotoUri(uri);
+    await runOcrOnUri(uri);
+  };
+
+  const handlePickQuotePhoto = async () => {
+    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!perm.granted) {
+      Alert.alert('Permission needed', 'Photo library permission is required to select a quote photo.');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.8,
+      allowsEditing: true,
+    });
+
+    if (result.canceled) return;
+    const uri = result.assets?.[0]?.uri;
+    if (!uri) return;
+    setQuotePhotoUri(uri);
+    await runOcrOnUri(uri);
+  };
 
   const extractJobType = (text: string): string => {
     const lower = text.toLowerCase();
@@ -61,8 +207,26 @@ export default function AIQuoteAnalysisScreen({ user }: AIQuoteAnalysisScreenPro
   };
 
   const handleAnalyze = async () => {
-    if (!quoteText.trim()) {
-      Alert.alert('Error', 'Please enter or paste a quote');
+    const hasPaste = quoteText.trim().length > 0;
+    const hasManualParts = Object.values(parts).some(Boolean) || otherParts.trim().length > 0;
+    const hasManual = hasManualParts || totalCost.trim().length > 0 || notes.trim().length > 0;
+
+    if (entryMode === 'paste' && !hasPaste) {
+      Alert.alert('Error', 'Please enter or paste a written quote');
+      return;
+    }
+    if (entryMode === 'manual') {
+      if (!hasManualParts) {
+        Alert.alert('Error', 'Please select at least one part/service (or add Other Parts/Services)');
+        return;
+      }
+      if (!totalCost.trim()) {
+        Alert.alert('Error', 'Please enter the total cost');
+        return;
+      }
+    }
+    if (entryMode === 'combined' && !hasPaste && !hasManual) {
+      Alert.alert('Error', 'Paste a quote or enter the job details manually');
       return;
     }
     if (!doorSetup.trim()) {
@@ -76,20 +240,36 @@ export default function AIQuoteAnalysisScreen({ user }: AIQuoteAnalysisScreenPro
       const apiKey = config.groqApiKey;
       const aiService = new AIService(apiKey);
 
-      await telemetry.traceOperation('ai.analyze_quote', { timing, doorSetup, inputLength: quoteText.length }, async () => {
-        const analysis = await aiService.analyzeQuote(quoteText, timing, doorSetup);
+      const analysisInput = buildAnalysisInput();
+
+      await telemetry.traceOperation(
+        'ai.analyze_quote',
+        {
+          timing,
+          doorSetup,
+          entryMode,
+          hasPaste,
+          hasManual,
+          inputLength: analysisInput.length,
+        },
+        async () => {
+        const analysis = await aiService.analyzeQuote(analysisInput, timing, doorSetup);
         setResult(analysis);
+
+        const parsedTotalCost = parseFloat(totalCost);
+        const amount = !Number.isNaN(parsedTotalCost) && parsedTotalCost > 0 ? parsedTotalCost : extractAmount(quoteText);
+        const jobType = hasManualParts ? getManualJobType() : extractJobType(quoteText);
 
         const quote: Quote = {
           id: Date.now().toString(),
           hoaId: user.hoaId,
           submittedAt: new Date().toISOString(),
-          jobType: extractJobType(quoteText),
+          jobType,
           timing,
           doorSetup,
-          quotedAmount: extractAmount(quoteText),
+          quotedAmount: amount,
           verdict: analysis.verdict,
-          notes: quoteText.substring(0, 200),
+          notes: analysisInput.substring(0, 200),
         };
         await StorageService.addQuote(quote);
       });
@@ -104,20 +284,118 @@ export default function AIQuoteAnalysisScreen({ user }: AIQuoteAnalysisScreenPro
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.instructions}>
-        Paste or type the quote text below. Include line items, totals, and any warranty language.
+        {entryMode === 'paste'
+          ? 'Paste or type the quote text below. Include line items, totals, and any warranty language.'
+          : entryMode === 'manual'
+            ? 'Select the parts/services and enter the total cost. The AI will sanity-check the overall job price and suggest friendly questions.'
+            : 'Paste a written quote and/or enter the job details manually. The AI will sanity-check the overall job price and suggest friendly questions.'}
       </Text>
 
-      <Text style={styles.label}>Quote Text *</Text>
-      <TextInput
-        style={styles.textArea}
-        placeholder="Paste your quote here..."
-        placeholderTextColor={colors.textMuted}
-        value={quoteText}
-        onChangeText={setQuoteText}
-        multiline
-        numberOfLines={10}
-        textAlignVertical="top"
-      />
+      {entryMode !== 'manual' && (
+        <>
+          <Text style={styles.label}>Quote Text {entryMode === 'paste' ? '*' : '(optional)'}</Text>
+
+          <View style={styles.ocrRow}>
+            <TouchableOpacity
+              style={[styles.ocrBtn, (ocrLoading || loading) && styles.ocrBtnDisabled]}
+              onPress={handleTakeQuotePhoto}
+              disabled={ocrLoading || loading}
+            >
+              {ocrLoading ? <ActivityIndicator color={colors.text} /> : <Text style={styles.ocrBtnText}>Take Photo</Text>}
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.ocrBtn, (ocrLoading || loading) && styles.ocrBtnDisabled]}
+              onPress={handlePickQuotePhoto}
+              disabled={ocrLoading || loading}
+            >
+              <Text style={styles.ocrBtnText}>Choose Photo</Text>
+            </TouchableOpacity>
+          </View>
+
+          {!!ocrStatus && <Text style={styles.hint}>{ocrStatus}</Text>}
+          {!!quotePhotoUri && !ocrStatus && <Text style={styles.hint}>Photo selected.</Text>}
+
+          <TextInput
+            style={styles.textArea}
+            placeholder="Paste your quote here..."
+            placeholderTextColor={colors.textMuted}
+            value={quoteText}
+            onChangeText={setQuoteText}
+            multiline
+            numberOfLines={10}
+            textAlignVertical="top"
+          />
+        </>
+      )}
+
+      {entryMode !== 'paste' && (
+        <>
+          <Text style={styles.label}>Parts & Services {entryMode === 'manual' ? '*' : '(optional)'}</Text>
+          <View style={styles.checkboxGroup}>
+            {([
+              { key: 'torsionSprings', label: 'Torsion Springs (pair)' },
+              { key: 'rollers', label: 'Rollers' },
+              { key: 'hinges', label: 'Hinges' },
+              { key: 'cables', label: 'Cables' },
+              { key: 'opener', label: 'Opener' },
+              { key: 'panels', label: 'Panels' },
+              { key: 'fullDoor', label: 'Full Door Replacement' },
+            ] as const).map((item) => (
+              <TouchableOpacity
+                key={item.key}
+                style={styles.checkbox}
+                onPress={() => togglePart(item.key)}
+              >
+                <View style={[styles.checkboxBox, parts[item.key] && styles.checkboxBoxChecked]}>
+                  {parts[item.key] && <Text style={styles.checkboxCheck}>✓</Text>}
+                </View>
+                <Text style={styles.checkboxLabel}>{item.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {parts.torsionSprings && (
+            <Text style={styles.hint}>
+              Springs-only benchmark: if the wire size is ≤ 0.250, scheduled pricing generally shouldn’t exceed ~$600. If it’s higher, ask what makes it premium (spring type/cycle rating/wire size) and what’s included.
+            </Text>
+          )}
+
+          <Text style={styles.label}>Other Parts/Services</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="e.g., Weatherstripping, tune-up"
+            placeholderTextColor={colors.textMuted}
+            value={otherParts}
+            onChangeText={setOtherParts}
+          />
+          <Text style={styles.hint}>
+            Tip: a tune-up is often bundled with other work; as a standalone service it’s commonly ~$60–$75.
+          </Text>
+
+          <Text style={styles.label}>Total Cost (parts + labor) {entryMode === 'manual' ? '*' : '(optional)'}</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="e.g., 750"
+            placeholderTextColor={colors.textMuted}
+            value={totalCost}
+            onChangeText={setTotalCost}
+            keyboardType="numeric"
+          />
+          <Text style={styles.hint}>Enter the full amount on the quote (including parts, labor, and fees).</Text>
+
+          <Text style={styles.label}>Notes (Optional)</Text>
+          <TextInput
+            style={styles.textArea}
+            placeholder="Any other details about the job or what the tech said…"
+            placeholderTextColor={colors.textMuted}
+            value={notes}
+            onChangeText={setNotes}
+            multiline
+            numberOfLines={4}
+            textAlignVertical="top"
+          />
+        </>
+      )}
 
       <Text style={styles.label}>Door Setup *</Text>
       <TextInput
@@ -154,6 +432,10 @@ export default function AIQuoteAnalysisScreen({ user }: AIQuoteAnalysisScreenPro
             <Text style={styles.verdictText}>{getVerdictLabel(result.verdict)}</Text>
           </View>
 
+          <Text style={styles.resultMuted}>
+            The goal is to know the typical price, then calmly ask what drives anything above it. Premium parts can justify a higher total—clear specs and itemization should back it up.
+          </Text>
+
           <View style={styles.resultSection}>
             <Text style={styles.resultTitle}>Price context</Text>
             <Text style={styles.resultText}>{result.priceContext}</Text>
@@ -171,7 +453,10 @@ export default function AIQuoteAnalysisScreen({ user }: AIQuoteAnalysisScreenPro
           </View>
 
           <View style={styles.resultSection}>
-            <Text style={styles.resultTitle}>Questions for the vendor</Text>
+            <Text style={styles.resultTitle}>Questions to ask (friendly)</Text>
+            <Text style={styles.resultMuted}>
+              If the quote is above typical, ask for the specifics (itemized parts/labor/fees, materials/specs, warranty). If they won’t explain clearly, get another quote.
+            </Text>
             {result.vendorQuestions.length === 0 ? (
               <Text style={styles.resultMuted}>No questions suggested.</Text>
             ) : (
@@ -228,6 +513,36 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
   },
+  ocrRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+  ocrBtn: {
+    flex: 1,
+    height: 44,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ocrBtnDisabled: {
+    opacity: 0.6,
+  },
+  ocrBtnText: {
+    color: colors.text,
+    fontSize: 13,
+    fontWeight: '900',
+  },
+  hint: {
+    marginTop: 8,
+    fontSize: 12,
+    lineHeight: 16,
+    color: colors.textMuted,
+    fontWeight: '700',
+  },
   textArea: {
     minHeight: 170,
     borderWidth: 1,
@@ -238,6 +553,44 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontSize: 15,
     fontWeight: '700',
+  },
+  checkboxGroup: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: spacing.sm,
+  },
+  checkbox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+  },
+  checkboxBox: {
+    width: 24,
+    height: 24,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 6,
+    marginRight: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surfaceMuted,
+  },
+  checkboxBoxChecked: {
+    backgroundColor: colors.accentAlt,
+    borderColor: colors.accent,
+  },
+  checkboxCheck: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '900',
+  },
+  checkboxLabel: {
+    fontSize: 15,
+    color: colors.text,
+    fontWeight: '800',
   },
   segmented: {
     flexDirection: 'row',

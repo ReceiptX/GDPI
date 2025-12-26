@@ -118,13 +118,13 @@ export default function AppNavigator({ user, onLogin, onLogout }: AppNavigatorPr
               name="AIQuoteAnalysis"
               options={{ title: 'AI Quote Analysis' }}
             >
-              {(props) => <AIQuoteAnalysisScreen {...props} user={user} />}
+              {() => <AIQuoteAnalysisScreen user={user} />}
             </Stack.Screen>
             <Stack.Screen
               name="ManualQuoteEntry"
               options={{ title: 'Manual Entry' }}
             >
-              {(props) => <ManualQuoteEntryScreen {...props} user={user} />}
+              {() => <ManualQuoteEntryScreen user={user} />}
             </Stack.Screen>
             <Stack.Screen
               name="NeighborhoodPricing"
