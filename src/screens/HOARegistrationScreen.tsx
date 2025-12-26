@@ -37,7 +37,7 @@ export default function HOARegistrationScreen({ onRegistrationComplete }: HOAReg
     'Community pricing history',
     'Admin management tools',
     'PIN-based secure access',
-    'Red flag detection',
+    'Educational red-flag guidance',
     'Future GDPI services launched during your lock',
   ];
 

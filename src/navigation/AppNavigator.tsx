@@ -9,7 +9,6 @@ import { colors } from '../utils/theme';
 import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
 import AIQuoteAnalysisScreen from '../screens/AIQuoteAnalysisScreen';
-import ManualQuoteEntryScreen from '../screens/ManualQuoteEntryScreen';
 import NeighborhoodPricingScreen from '../screens/NeighborhoodPricingScreen';
 import AdminRosterScreen from '../screens/AdminRosterScreen';
 import HOARegistrationScreen from '../screens/HOARegistrationScreen';
@@ -19,7 +18,6 @@ export type RootStackParamList = {
   HOARegistration: undefined;
   Home: undefined;
   AIQuoteAnalysis: undefined;
-  ManualQuoteEntry: undefined;
   NeighborhoodPricing: undefined;
   AdminRoster: undefined;
 };
@@ -43,7 +41,6 @@ export default function AppNavigator({ user, onLogin, onLogout }: AppNavigatorPr
         HOARegistration: 'register',
         Home: 'home',
         AIQuoteAnalysis: 'ai-analysis',
-        ManualQuoteEntry: 'manual-entry',
         NeighborhoodPricing: 'pricing-history',
         AdminRoster: 'admin',
       },
@@ -119,12 +116,6 @@ export default function AppNavigator({ user, onLogin, onLogout }: AppNavigatorPr
               options={{ title: 'AI Quote Analysis' }}
             >
               {() => <AIQuoteAnalysisScreen user={user} />}
-            </Stack.Screen>
-            <Stack.Screen
-              name="ManualQuoteEntry"
-              options={{ title: 'Manual Entry' }}
-            >
-              {() => <ManualQuoteEntryScreen user={user} />}
             </Stack.Screen>
             <Stack.Screen
               name="NeighborhoodPricing"

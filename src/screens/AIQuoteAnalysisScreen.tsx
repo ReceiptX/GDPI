@@ -19,10 +19,16 @@ interface AIQuoteAnalysisScreenProps {
   entryMode?: 'paste' | 'manual' | 'combined';
 }
 
+type DoorType = 'single' | 'double' | 'unknown';
+type DoorHeight = '7ft' | '8ft' | 'unknown';
+type DoorInsulation = 'insulated' | 'non-insulated' | 'unknown';
+
 export default function AIQuoteAnalysisScreen({ user, entryMode = 'combined' }: AIQuoteAnalysisScreenProps) {
   const [quoteText, setQuoteText] = useState('');
   const [timing, setTiming] = useState<JobTiming>('scheduled');
-  const [doorSetup, setDoorSetup] = useState('');
+  const [doorType, setDoorType] = useState<DoorType>('unknown');
+  const [doorHeight, setDoorHeight] = useState<DoorHeight>('unknown');
+  const [doorInsulation, setDoorInsulation] = useState<DoorInsulation>('unknown');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AIAnalysisResult | null>(null);
 
@@ -109,6 +115,14 @@ export default function AIQuoteAnalysisScreen({ user, entryMode = 'combined' }: 
     text += '- If the quote text and manual entry conflict, list what to clarify.\n';
 
     return text;
+  };
+
+  const buildDoorSetup = (): string => {
+    const typeLabel = doorType === 'single' ? 'Single' : doorType === 'double' ? 'Double' : 'Unknown';
+    const insLabel =
+      doorInsulation === 'insulated' ? 'insulated' : doorInsulation === 'non-insulated' ? 'non-insulated' : 'insulation unknown';
+    const heightLabel = doorHeight === '7ft' ? '7ft' : doorHeight === '8ft' ? '8ft' : 'height unknown';
+    return `${typeLabel} door, ${insLabel}, ${heightLabel}`;
   };
 
   const runOcrOnUri = async (uri: string) => {
@@ -229,10 +243,12 @@ export default function AIQuoteAnalysisScreen({ user, entryMode = 'combined' }: 
       Alert.alert('Error', 'Paste a quote or enter the job details manually');
       return;
     }
-    if (!doorSetup.trim()) {
-      Alert.alert('Error', 'Please specify your door setup (e.g., "Double, insulated, 7ft")');
+    if (doorType === 'unknown') {
+      Alert.alert('Error', 'Please select your door type (single or double)');
       return;
     }
+
+    const doorSetup = buildDoorSetup();
 
     setLoading(true);
     setResult(null);
@@ -294,6 +310,14 @@ export default function AIQuoteAnalysisScreen({ user, entryMode = 'combined' }: 
       {entryMode !== 'manual' && (
         <>
           <Text style={styles.label}>Quote Text {entryMode === 'paste' ? '*' : '(optional)'}</Text>
+
+          <View style={styles.warningCard}>
+            <Text style={styles.warningTitle}>Quick red-flag check (before you upload)</Text>
+            <Text style={styles.warningItem}>• Vague “lifetime warranty” bundles with no itemization</Text>
+            <Text style={styles.warningItem}>• Pushing a full door replacement without clear damage proof</Text>
+            <Text style={styles.warningItem}>• Extreme labor markups (no parts/specs to justify it)</Text>
+            <Text style={styles.warningItem}>• Refurbished parts sold as new (ask brand/model)</Text>
+          </View>
 
           <View style={styles.ocrRow}>
             <TouchableOpacity
@@ -397,14 +421,73 @@ export default function AIQuoteAnalysisScreen({ user, entryMode = 'combined' }: 
         </>
       )}
 
-      <Text style={styles.label}>Door Setup *</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="e.g., Double, insulated, 7ft"
-        placeholderTextColor={colors.textMuted}
-        value={doorSetup}
-        onChangeText={setDoorSetup}
-      />
+      <Text style={styles.label}>Door type *</Text>
+      <View style={styles.checkboxGroup}>
+        {(
+          [
+            { key: 'single' as const, label: 'Single door' },
+            { key: 'double' as const, label: 'Double door' },
+          ]
+        ).map((item) => (
+          <TouchableOpacity
+            key={item.key}
+            style={styles.checkbox}
+            onPress={() => setDoorType(item.key)}
+          >
+            <View style={[styles.checkboxBox, doorType === item.key && styles.checkboxBoxChecked]}>
+              {doorType === item.key && <Text style={styles.checkboxCheck}>✓</Text>}
+            </View>
+            <Text style={styles.checkboxLabel}>{item.label}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      <Text style={styles.label}>Door details (optional)</Text>
+      <Text style={styles.hint}>If you’re not sure, leave these as “Unknown”.</Text>
+
+      <Text style={styles.label}>Height</Text>
+      <View style={styles.segmented}>
+        <TouchableOpacity
+          style={[styles.segment, doorHeight === 'unknown' && styles.segmentSelected]}
+          onPress={() => setDoorHeight('unknown')}
+        >
+          <Text style={[styles.segmentText, doorHeight === 'unknown' && styles.segmentTextSelected]}>Unknown</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.segment, doorHeight === '7ft' && styles.segmentSelected]}
+          onPress={() => setDoorHeight('7ft')}
+        >
+          <Text style={[styles.segmentText, doorHeight === '7ft' && styles.segmentTextSelected]}>7ft</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.segment, doorHeight === '8ft' && styles.segmentSelected]}
+          onPress={() => setDoorHeight('8ft')}
+        >
+          <Text style={[styles.segmentText, doorHeight === '8ft' && styles.segmentTextSelected]}>8ft</Text>
+        </TouchableOpacity>
+      </View>
+
+      <Text style={styles.label}>Insulation</Text>
+      <View style={styles.segmented}>
+        <TouchableOpacity
+          style={[styles.segment, doorInsulation === 'unknown' && styles.segmentSelected]}
+          onPress={() => setDoorInsulation('unknown')}
+        >
+          <Text style={[styles.segmentText, doorInsulation === 'unknown' && styles.segmentTextSelected]}>Unknown</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.segment, doorInsulation === 'non-insulated' && styles.segmentSelected]}
+          onPress={() => setDoorInsulation('non-insulated')}
+        >
+          <Text style={[styles.segmentText, doorInsulation === 'non-insulated' && styles.segmentTextSelected]}>Non‑insulated</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.segment, doorInsulation === 'insulated' && styles.segmentSelected]}
+          onPress={() => setDoorInsulation('insulated')}
+        >
+          <Text style={[styles.segmentText, doorInsulation === 'insulated' && styles.segmentTextSelected]}>Insulated</Text>
+        </TouchableOpacity>
+      </View>
 
       <Text style={styles.label}>Timing</Text>
       <View style={styles.segmented}>
@@ -541,6 +624,27 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 16,
     color: colors.textMuted,
+    fontWeight: '700',
+  },
+  warningCard: {
+    marginTop: spacing.sm,
+    marginBottom: spacing.sm,
+    backgroundColor: 'rgba(250, 204, 21, 0.08)',
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.warning,
+  },
+  warningTitle: {
+    fontSize: 13,
+    fontWeight: '900',
+    color: colors.warning,
+    marginBottom: 8,
+  },
+  warningItem: {
+    fontSize: 13,
+    color: colors.text,
+    marginBottom: 6,
     fontWeight: '700',
   },
   textArea: {

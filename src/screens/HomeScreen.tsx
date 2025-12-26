@@ -44,12 +44,7 @@ export default function HomeScreen({ navigation, user, onLogout }: HomeScreenPro
 
       <TouchableOpacity style={[styles.cardBtn, styles.cardBtnPrimary]} onPress={() => navigation.navigate('AIQuoteAnalysis')}>
         <Text style={styles.cardBtnTitle}>AI Quote Analysis</Text>
-        <Text style={styles.cardBtnSub}>Paste a written quote and/or add parts + total cost for a full sanity check.</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.cardBtn} onPress={() => navigation.navigate('ManualQuoteEntry')}>
-        <Text style={styles.cardBtnTitle}>Manual Quote Entry</Text>
-        <Text style={styles.cardBtnSub}>No written quote? Enter parts/services and the total cost (parts + labor).</Text>
+        <Text style={styles.cardBtnSub}>Paste a written quote (or snap a photo) and/or add parts + total cost for a full sanity check.</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.cardBtn} onPress={() => navigation.navigate('NeighborhoodPricing')}>
