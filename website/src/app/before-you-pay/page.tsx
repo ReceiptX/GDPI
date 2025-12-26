@@ -4,12 +4,11 @@ import { Callout } from '@/components/Callout';
 import { Card } from '@/components/Card';
 import { Container } from '@/components/Container';
 import { SectionHeading } from '@/components/SectionHeading';
-import { SPRING_BALANCE_CHECK_SCRIPT } from '@/lib/priceIndex';
 
 export const metadata: Metadata = {
   title: 'Before you pay',
   description:
-    'A 60-second checklist that prevents the biggest spring scam: wrong springs → unbalanced door → opener damage. Ask to see the door balanced before payment.',
+    'Subscriber-only proof checks that prevent expensive spring mistakes. Learn what to request before paying for spring work.',
 };
 
 export default function BeforeYouPayPage() {
@@ -18,31 +17,31 @@ export default function BeforeYouPayPage() {
       <Container>
         <SectionHeading
           eyebrow="The homeowner protection page"
-          title="Before you pay: do these checks"
-          description="This is what makes GDPI different: simple proof checks that good technicians can demonstrate in seconds."
+          title="Before you pay: subscriber-only proof checks"
+          description="We keep the step-by-step proof checks inside GDPI for subscribers. This page explains what you’ll unlock and why it matters."
         />
 
         <div className="mt-10 grid gap-6 lg:grid-cols-12 lg:items-start">
           <div className="lg:col-span-7">
             <Callout variant="warning">
-              <p className="text-sm font-semibold text-white">Signature check</p>
+              <p className="text-sm font-semibold text-white">Subscriber-only unlock</p>
               <p className="mt-2 font-heading text-2xl font-extrabold text-white">
-                {SPRING_BALANCE_CHECK_SCRIPT.headline}
+                The spring-work proof checklist (Balance Test)
               </p>
-              <p className="mt-4 text-sm leading-6 text-slate-100">Steps:</p>
-              <ol className="mt-2 space-y-2 text-sm leading-6 text-slate-100">
-                {SPRING_BALANCE_CHECK_SCRIPT.steps.map((s) => (
-                  <li key={s} className="flex gap-2">
-                    <span className="mt-[2px] inline-flex h-5 w-5 flex-none items-center justify-center rounded-md bg-white/10 text-xs font-bold text-white">
-                      •
-                    </span>
-                    <span>{s}</span>
-                  </li>
-                ))}
-              </ol>
-              <p className="mt-5 text-sm leading-6 text-slate-100">
-                <span className="font-semibold text-white">Why it matters: </span>
-                {SPRING_BALANCE_CHECK_SCRIPT.whyItMatters}
+              <p className="mt-4 text-sm leading-6 text-slate-100">
+                Springs are where the highest-cost mistakes happen. GDPI includes a quick proof checklist that helps
+                residents avoid the chain reaction of recurring service calls and premature opener wear.
+              </p>
+              <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+                <Button asChild href="/request-demo" size="lg">
+                  Request a demo
+                </Button>
+                <Button asChild href="/pricing" variant="secondary" size="lg">
+                  See pricing
+                </Button>
+              </div>
+              <p className="mt-4 text-xs text-slate-300">
+                Note: we intentionally keep the step-by-step checklist inside the subscriber experience.
               </p>
             </Callout>
 
@@ -68,8 +67,7 @@ export default function BeforeYouPayPage() {
             <Callout variant="info" className="h-full">
               <p className="text-sm font-semibold text-white">A calm script (copy/paste)</p>
               <p className="mt-3 text-sm leading-6 text-slate-100">
-                “Can you help me understand what’s included in this price (parts, labor, and any fees)?
-                Also, before I pay, can you show me the door is balanced?”
+                “Can you help me understand what’s included in this price (parts, labor, and any fees)?”
               </p>
               <p className="mt-4 text-sm leading-6 text-slate-100">
                 Good techs can demonstrate. Bad techs usually avoid specifics.

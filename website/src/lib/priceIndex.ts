@@ -19,7 +19,7 @@ export const PRICE_INDEX: PriceIndexItem[] = [
     notes: ['Non-premium wire sizes (.192–.250).', 'Ask for spring type, wire size, and cycle rating.'],
     homeownerQuestions: [
       'Can you confirm the spring wire size and whether they are oil-tempered or water-tempered?',
-      'Before I pay, can you show me the door is balanced after the spring replacement?',
+      'What is the cycle rating and what warranty is included on parts and labor?',
     ],
   },
   {
@@ -157,15 +157,3 @@ export const GLOBAL_RED_FLAGS: string[] = [
   'Extreme labor markups without specs to justify it',
   'Refurbished parts sold as new (ask brand/model and packaging)',
 ];
-
-export const SPRING_BALANCE_CHECK_SCRIPT = {
-  headline: 'Before you pay for spring work: “Can you show me my door is balanced?”',
-  steps: [
-    'Disconnect the opener (release).',
-    'Lift the door with minimal effort.',
-    'Let go at ~3 points. The door should stay at those points (small movement is OK).',
-    'If it drops → too heavy. If it shoots up → too light. Either indicates the door is out of balance.',
-  ],
-  whyItMatters:
-    'An unbalanced door makes the opener fight the door, reducing opener life and causing repeat issues. Balance is the simplest proof the correct springs were used and the job was finished properly.',
-};

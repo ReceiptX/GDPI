@@ -64,14 +64,14 @@ export default function HowItWorksPage() {
             <Callout variant="warning">
               <p className="text-sm font-semibold text-white">The single most important check</p>
               <p className="mt-2 font-heading text-xl font-extrabold text-white">
-                “Can you show me my door is balanced?”
+                Spring-work proof checklist (subscriber-only)
               </p>
               <p className="mt-3 text-sm leading-6 text-slate-100">
-                If springs are being replaced, this is the proof the job was finished correctly.
+                If springs are being replaced, GDPI provides a quick proof checklist residents can use before paying.
               </p>
               <div className="mt-5">
                 <Button asChild href="/before-you-pay" variant="secondary">
-                  See the balance test
+                  Learn more
                 </Button>
               </div>
             </Callout>

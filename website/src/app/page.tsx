@@ -103,14 +103,16 @@ export default function HomePage() {
               />
               <Callout variant="warning" className="mt-6">
                 <p className="text-sm font-semibold text-white">Ask this before payment:</p>
-                <p className="mt-2 font-heading text-xl font-extrabold text-white">“Can you show me my door is balanced?”</p>
+                <p className="mt-2 font-heading text-xl font-extrabold text-white">
+                  Spring-work proof checklist (subscriber-only)
+                </p>
                 <p className="mt-3 text-sm leading-6 text-slate-100">
-                  A tech should disconnect the opener and demonstrate the door stays at several points when released.
-                  If it drops or shoots up, the springs may be wrong and the opener will wear out faster.
+                  GDPI includes a short proof checklist residents can use before paying for spring work. We keep the
+                  step-by-step details inside the subscriber experience.
                 </p>
                 <div className="mt-5">
                   <Button asChild href="/before-you-pay" variant="secondary">
-                    See the 60‑second balance test
+                    Learn what you’ll unlock
                   </Button>
                 </div>
               </Callout>

@@ -84,10 +84,10 @@ export default function PricingPage() {
                 annual cost for multiple homes.
               </p>
               <p className="mt-4 text-sm font-semibold text-white">Your signature check:</p>
-              <p className="mt-2 font-heading text-xl font-extrabold text-white">“Can you show me my door is balanced?”</p>
+              <p className="mt-2 font-heading text-xl font-extrabold text-white">Spring-work proof checklist (subscriber-only)</p>
               <div className="mt-5">
                 <Button asChild href="/before-you-pay" variant="secondary">
-                  See the balance test
+                  Learn more
                 </Button>
               </div>
             </Callout>

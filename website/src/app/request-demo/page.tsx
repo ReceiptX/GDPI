@@ -41,10 +41,12 @@ export default function RequestDemoPage() {
             <Callout variant="warning" className="h-full">
               <p className="text-sm font-semibold text-white">For spring tickets, this saves the most money</p>
               <p className="mt-2 text-sm leading-6 text-slate-100">
-                Ask the tech to demonstrate the door is balanced before payment. If they can’t, the opener will suffer.
+                GDPI includes a spring-work proof checklist that helps prevent repeat issues and expensive follow-on damage.
               </p>
-              <p className="mt-4 text-sm font-semibold text-white">Script:</p>
-              <p className="mt-2 font-heading text-xl font-extrabold text-white">“Can you show me my door is balanced?”</p>
+              <p className="mt-4 text-sm font-semibold text-white">Included for subscribers</p>
+              <p className="mt-2 text-sm leading-6 text-slate-100">
+                The full spring-work proof checklist (balance test) is available inside GDPI.
+              </p>
             </Callout>
           </div>
         </div>
