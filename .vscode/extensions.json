@@ -1,0 +1,36 @@
+{
+  "recommendations": [
+    // React Native and Expo
+    "msjsdiag.vscode-react-native",
+    "expo.vscode-expo-tools",
+    
+    // TypeScript
+    "ms-vscode.vscode-typescript-next",
+    
+    // Code formatting
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    
+    // React snippets
+    "dsznajder.es7-react-js-snippets",
+    
+    // Path intellisense
+    "christian-kohler.path-intellisense",
+    
+    // Auto rename tag
+    "formulahendry.auto-rename-tag",
+    
+    // Git
+    "eamodio.gitlens",
+    
+    // Environment variables
+    "mikestead.dotenv",
+    
+    // Markdown support
+    "yzhang.markdown-all-in-one",
+    
+    // EditorConfig
+    "editorconfig.editorconfig"
+  ],
+  "unwantedRecommendations": []
+}

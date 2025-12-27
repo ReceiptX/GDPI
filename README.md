@@ -1,5 +1,8 @@
 # Garage Door Pricing Index (GDPI)
 
+[![Open in Visual Studio Code](https://img.shields.io/badge/Open%20in-VS%20Code-007ACC?logo=visualstudiocode)](https://vscode.dev/github/ReceiptX/GDPI)
+[![Open in GitHub Codespaces](https://img.shields.io/badge/Open%20in-Codespaces-24292e?logo=github)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=ReceiptX/GDPI)
+
 ## Overview
 
 GDPI is a multi-tenant SaaS platform for Arizona HOAs and homeowners that uses AI to analyze garage door service quotes, detect pricing red flags, and provide educational context around fair market rates.
@@ -48,6 +51,24 @@ GDPI is a multi-tenant SaaS platform for Arizona HOAs and homeowners that uses A
 - Expo CLI (`npm install -g expo-cli`)
 - iOS Simulator (macOS) or Android Studio (for Android development)
 - Expo Go app on physical device (optional, for testing)
+
+## Quick Start with VS Code
+
+### Option 1: Open in Browser
+Click the "Open in VS Code" badge above to open this repository in VS Code for the Web (vscode.dev) - no installation required!
+
+### Option 2: GitHub Codespaces
+Click the "Open in Codespaces" badge above to launch a complete development environment in your browser with all dependencies pre-installed.
+
+### Option 3: Local VS Code
+1. Clone the repository
+2. Open in VS Code: `code GDPI`
+3. Install recommended extensions when prompted
+4. The workspace is pre-configured with:
+   - TypeScript and React Native support
+   - Debugging configurations for iOS/Android
+   - Code formatting and linting settings
+   - Expo tools integration
 
 ## Setup Instructions
 
@@ -175,6 +196,22 @@ GDPI/
 3. **View Analytics**: Check aggregated community pricing data
 
 ## Development
+
+### VS Code Debugging
+
+This repository includes pre-configured debug configurations for VS Code:
+
+1. **Attach to packager**: Attach the debugger to a running Expo dev server
+2. **Run Android on Emulator**: Launch and debug on Android emulator
+3. **Run iOS on Simulator**: Launch and debug on iOS simulator
+4. **Debug in Exponent**: Debug using Expo Go app
+5. **TypeScript: Check Types**: Run type checking
+
+To debug:
+1. Start the dev server: `npm start`
+2. Open the Debug panel (Ctrl+Shift+D / Cmd+Shift+D)
+3. Select a debug configuration
+4. Press F5 or click "Start Debugging"
 
 ### Type Checking
 
