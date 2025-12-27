@@ -1,7 +1,7 @@
 ﻿import React from "react";
 import { SafeAreaView, View, Text, StyleSheet, Pressable } from "react-native";
 import { GDPILogo } from "../components/GDPILogo";
-import { colors, spacing, radius } from "../utils/theme";
+import { colors, spacing, radius, fonts } from "../utils/theme";
 import { EARLY_ACCESS_PLAN, formatCurrency } from "../utils/subscription";
 
 export default function LandingScreen({ navigation }: any) {
@@ -100,8 +100,8 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: spacing.lg, justifyContent: "center" },
 
   hero: { marginTop: spacing.lg },
-  h1: { fontSize: 28, fontWeight: "900", color: colors.text, marginBottom: spacing.sm },
-  p: { fontSize: 14, color: colors.textMuted, lineHeight: 20 },
+  h1: { fontSize: 28, fontFamily: fonts.heading, color: colors.text, marginBottom: spacing.sm },
+  p: { fontSize: 14, fontFamily: fonts.body, color: colors.textMuted, lineHeight: 20 },
 
   rateCard: {
     marginTop: spacing.lg,
@@ -119,13 +119,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceMuted,
     color: colors.accent,
     fontSize: 12,
-    fontWeight: "800",
+    fontFamily: fonts.bodyStrong,
     letterSpacing: 0.5,
     marginBottom: spacing.xs,
   },
-  ratePrice: { fontSize: 32, fontWeight: "900", color: colors.text },
-  rateInterval: { fontSize: 16, fontWeight: "700", color: colors.textMuted },
-  rateCopy: { marginTop: spacing.xs, fontSize: 14, color: colors.textMuted, lineHeight: 20 },
+  ratePrice: { fontSize: 32, fontFamily: fonts.heading, color: colors.text },
+  rateInterval: { fontSize: 16, fontFamily: fonts.body, color: colors.textMuted },
+  rateCopy: { marginTop: spacing.xs, fontSize: 14, fontFamily: fonts.body, color: colors.textMuted, lineHeight: 20 },
 
   card: {
     marginTop: spacing.lg,
@@ -135,9 +135,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  cardTitle: { fontSize: 14, fontWeight: "800", color: colors.accent, marginBottom: spacing.sm },
-  cardSubtitle: { marginTop: -4, marginBottom: spacing.md, fontSize: 13, color: colors.textMuted, lineHeight: 18 },
-  cardItem: { fontSize: 13, color: colors.text, lineHeight: 20, marginBottom: 6 },
+  cardTitle: { fontSize: 14, fontFamily: fonts.headingStrong, color: colors.accent, marginBottom: spacing.sm },
+  cardSubtitle: { marginTop: -4, marginBottom: spacing.md, fontSize: 13, fontFamily: fonts.body, color: colors.textMuted, lineHeight: 18 },
+  cardItem: { fontSize: 13, fontFamily: fonts.body, color: colors.text, lineHeight: 20, marginBottom: 6 },
 
   valueGrid: { gap: spacing.sm },
   valueCard: {
@@ -147,18 +147,18 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     padding: spacing.md,
   },
-  valueTitle: { fontSize: 13, fontWeight: "900", color: colors.text, marginBottom: 6 },
-  valueBody: { fontSize: 13, color: colors.textMuted, lineHeight: 18 },
-  valueHow: { marginTop: spacing.xs, fontSize: 12, color: colors.text, lineHeight: 18, fontWeight: "700" },
-  valueDisclaimer: { marginTop: spacing.sm, fontSize: 12, color: colors.textMuted, lineHeight: 18 },
+  valueTitle: { fontSize: 13, fontFamily: fonts.headingStrong, color: colors.text, marginBottom: 6 },
+  valueBody: { fontSize: 13, fontFamily: fonts.body, color: colors.textMuted, lineHeight: 18 },
+  valueHow: { marginTop: spacing.xs, fontSize: 12, fontFamily: fonts.body, color: colors.text, lineHeight: 18 },
+  valueDisclaimer: { marginTop: spacing.sm, fontSize: 12, fontFamily: fonts.body, color: colors.textMuted, lineHeight: 18 },
 
   actions: { marginTop: spacing.lg, gap: spacing.sm },
   btn: { height: 48, borderRadius: radius.md, alignItems: "center", justifyContent: "center", borderWidth: 1 },
   btnPrimary: { backgroundColor: colors.accentAlt, borderColor: colors.accent },
   btnSecondary: { backgroundColor: colors.surfaceMuted, borderColor: colors.border },
-  btnText: { fontSize: 14, fontWeight: "800" },
+  btnText: { fontSize: 14, fontFamily: fonts.bodyStrong },
   btnTextPrimary: { color: colors.text },
   btnTextSecondary: { color: colors.text },
 
-  footnote: { marginTop: spacing.md, fontSize: 12, color: colors.textMuted },
+  footnote: { marginTop: spacing.md, fontSize: 12, fontFamily: fonts.body, color: colors.textMuted },
 });

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AIAnalysisResult, JobTiming, Quote, QuoteVerdict, User } from '../types';
 import { AIService } from '../services/ai';
 import { OCRService } from '../services/ocr';
@@ -8,9 +9,11 @@ import { StorageService } from '../services/storage';
 import { telemetry } from '../services/telemetry';
 import config from '../utils/config';
 import { colors, spacing, radius, fonts } from '../utils/theme';
+import { RootStackParamList } from '../navigation/AppNavigator';
 
 interface AIQuoteAnalysisScreenProps {
   user: User;
+  navigation?: NativeStackNavigationProp<RootStackParamList>;
   /**
    * paste: only written quote
    * manual: only part checklist + total cost
@@ -23,7 +26,7 @@ type DoorType = 'single' | 'double' | 'unknown';
 type DoorHeight = '7ft' | '8ft' | 'unknown';
 type DoorInsulation = 'insulated' | 'non-insulated' | 'unknown';
 
-export default function AIQuoteAnalysisScreen({ user, entryMode = 'combined' }: AIQuoteAnalysisScreenProps) {
+export default function AIQuoteAnalysisScreen({ user, navigation, entryMode = 'combined' }: AIQuoteAnalysisScreenProps) {
   const [quoteText, setQuoteText] = useState('');
   const [timing, setTiming] = useState<JobTiming>('scheduled');
   const [doorType, setDoorType] = useState<DoorType>('unknown');
@@ -31,6 +34,7 @@ export default function AIQuoteAnalysisScreen({ user, entryMode = 'combined' }: 
   const [doorInsulation, setDoorInsulation] = useState<DoorInsulation>('unknown');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AIAnalysisResult | null>(null);
+  const [analysisMeta, setAnalysisMeta] = useState<{ amount: number; jobType: string; timing: JobTiming } | null>(null);
 
   const [ocrLoading, setOcrLoading] = useState(false);
   const [ocrStatus, setOcrStatus] = useState<string>('');
@@ -252,6 +256,7 @@ export default function AIQuoteAnalysisScreen({ user, entryMode = 'combined' }: 
 
     setLoading(true);
     setResult(null);
+    setAnalysisMeta(null);
     try {
       const apiKey = config.groqApiKey;
       const aiService = new AIService(apiKey);
@@ -270,11 +275,13 @@ export default function AIQuoteAnalysisScreen({ user, entryMode = 'combined' }: 
         },
         async () => {
         const analysis = await aiService.analyzeQuote(analysisInput, timing, doorSetup);
-        setResult(analysis);
 
         const parsedTotalCost = parseFloat(totalCost);
         const amount = !Number.isNaN(parsedTotalCost) && parsedTotalCost > 0 ? parsedTotalCost : extractAmount(quoteText);
         const jobType = hasManualParts ? getManualJobType() : extractJobType(quoteText);
+
+        setResult(analysis);
+        setAnalysisMeta({ amount, jobType, timing });
 
         const quote: Quote = {
           id: Date.now().toString(),
@@ -515,6 +522,36 @@ export default function AIQuoteAnalysisScreen({ user, entryMode = 'combined' }: 
             <Text style={styles.verdictText}>{getVerdictLabel(result.verdict)}</Text>
           </View>
 
+          <View style={styles.valueModule}>
+            <Text style={styles.valueModuleTitle}>Value: potential avoided cost</Text>
+            <Text style={styles.valueModuleAmount}>{getAvoidedCostLabel(result.verdict, result.redFlags.length)}</Text>
+            <Text style={styles.valueModuleBody}>
+              {analysisMeta?.amount ? `Quote total captured: $${Math.round(analysisMeta.amount).toLocaleString()}. ` : ''}
+              Even a small imbalance can cascade into hardware and opener wear. GDPI helps you identify “not normal” early.
+            </Text>
+
+            <View style={styles.valueModuleActions}>
+              <TouchableOpacity
+                style={[styles.valueModuleBtn, styles.valueModuleBtnPrimary]}
+                onPress={() => {
+                  if (typeof navigation?.navigate === 'function') {
+                    navigation.navigate('ValueTimeline');
+                  } else {
+                    Alert.alert('Value timeline', 'Open the “Why $1.99 matters” timeline from the Home screen.');
+                  }
+                }}
+              >
+                <Text style={styles.valueModuleBtnTextPrimary}>See why</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.valueModuleBtn, styles.valueModuleBtnSecondary]}
+                onPress={() => Alert.alert('Subscriber-only', 'Proof checklists and step-by-step verification guidance are available to subscribers.')}
+              >
+                <Text style={styles.valueModuleBtnTextSecondary}>Unlock proof checks</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
           <Text style={styles.resultMuted}>
             The goal is to know the typical price, then calmly ask what drives anything above it. Premium parts can justify a higher total—clear specs and itemization should back it up.
           </Text>
@@ -561,6 +598,26 @@ export default function AIQuoteAnalysisScreen({ user, entryMode = 'combined' }: 
       )}
     </ScrollView>
   );
+}
+
+function getAvoidedCostLabel(verdict: QuoteVerdict, redFlagCount: number) {
+  const bump = Math.min(2, Math.floor(redFlagCount / 2));
+
+  if (verdict === 'red') {
+    const min = 800 + bump * 200;
+    const max = 1500 + bump * 250;
+    return `$${min.toLocaleString()}–$${max.toLocaleString()}+`;
+  }
+
+  if (verdict === 'yellow') {
+    const min = 300 + bump * 150;
+    const max = 900 + bump * 200;
+    return `$${min.toLocaleString()}–$${max.toLocaleString()}`;
+  }
+
+  const min = 100;
+  const max = 300;
+  return `$${min}–$${max}`;
 }
 
 const styles = StyleSheet.create({
@@ -748,6 +805,66 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
+  valueModule: {
+    marginTop: spacing.md,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(34, 211, 238, 0.28)',
+    backgroundColor: 'rgba(34, 211, 238, 0.08)',
+    padding: spacing.md,
+  },
+  valueModuleTitle: {
+    fontSize: 12,
+    fontFamily: fonts.headingStrong,
+    color: colors.accent,
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+  },
+  valueModuleAmount: {
+    marginTop: 6,
+    fontSize: 18,
+    fontFamily: fonts.heading,
+    color: colors.text,
+  },
+  valueModuleBody: {
+    marginTop: 8,
+    fontSize: 13,
+    lineHeight: 18,
+    fontFamily: fonts.body,
+    color: colors.text,
+  },
+  valueModuleActions: {
+    marginTop: spacing.sm,
+    flexDirection: 'row',
+    gap: spacing.sm,
+    flexWrap: 'wrap',
+  },
+  valueModuleBtn: {
+    height: 40,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  valueModuleBtnPrimary: {
+    backgroundColor: colors.accentAlt,
+    borderColor: colors.accent,
+  },
+  valueModuleBtnSecondary: {
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+  },
+  valueModuleBtnTextPrimary: {
+    fontSize: 13,
+    fontFamily: fonts.bodyBold,
+    color: colors.text,
+  },
+  valueModuleBtnTextSecondary: {
+    fontSize: 13,
+    fontFamily: fonts.bodyStrong,
+    color: colors.text,
+  },
   verdictBadge: {
     alignSelf: 'flex-start',
     paddingVertical: 6,
@@ -765,7 +882,7 @@ const styles = StyleSheet.create({
   },
   resultTitle: {
     fontSize: 12,
-    fontFamily: fonts.bodyStrong,
+    fontFamily: fonts.headingStrong,
     color: colors.accent,
     textTransform: 'uppercase',
     letterSpacing: 0.7,

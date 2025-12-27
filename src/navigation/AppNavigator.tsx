@@ -12,6 +12,7 @@ import AIQuoteAnalysisScreen from '../screens/AIQuoteAnalysisScreen';
 import NeighborhoodPricingScreen from '../screens/NeighborhoodPricingScreen';
 import AdminRosterScreen from '../screens/AdminRosterScreen';
 import HOARegistrationScreen from '../screens/HOARegistrationScreen';
+import ValueTimelineScreen from '../screens/ValueTimelineScreen';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -20,6 +21,7 @@ export type RootStackParamList = {
   AIQuoteAnalysis: undefined;
   NeighborhoodPricing: undefined;
   AdminRoster: undefined;
+  ValueTimeline: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -115,8 +117,14 @@ export default function AppNavigator({ user, onLogin, onLogout }: AppNavigatorPr
               name="AIQuoteAnalysis"
               options={{ title: 'AI Quote Analysis' }}
             >
-              {() => <AIQuoteAnalysisScreen user={user} />}
+              {(props) => <AIQuoteAnalysisScreen {...props} user={user} />}
             </Stack.Screen>
+
+            <Stack.Screen
+              name="ValueTimeline"
+              component={ValueTimelineScreen}
+              options={{ title: 'Why $1.99 matters' }}
+            />
             <Stack.Screen
               name="NeighborhoodPricing"
               options={{ title: 'Neighborhood Pricing' }}

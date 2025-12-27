@@ -40,6 +40,30 @@ export default function HomeScreen({ navigation, user, onLogout }: HomeScreenPro
         </View>
       </View>
 
+      <View style={styles.valueCard}>
+        <Text style={styles.valueEyebrow}>Savings snapshot</Text>
+        <Text style={styles.valueTitle}>A $1.99 check can prevent an $800+ mistake</Text>
+        <Text style={styles.valueBody}>
+          Small issues (like an out-of-balance door) often cascade into hardware and opener damage. GDPI helps you spot “not normal”
+          early.
+        </Text>
+
+        <View style={styles.valueActions}>
+          <TouchableOpacity
+            style={[styles.valueBtn, styles.valueBtnPrimary]}
+            onPress={() => navigation.navigate('AIQuoteAnalysis')}
+          >
+            <Text style={styles.valueBtnTextPrimary}>Check my quote</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.valueBtn, styles.valueBtnSecondary]}
+            onPress={() => navigation.navigate('ValueTimeline')}
+          >
+            <Text style={styles.valueBtnTextSecondary}>See the timeline</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
       <Text style={styles.sectionTitle}>Actions</Text>
 
       <TouchableOpacity style={[styles.cardBtn, styles.cardBtnPrimary]} onPress={() => navigation.navigate('AIQuoteAnalysis')}>
@@ -97,6 +121,67 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     borderWidth: 1,
     borderColor: colors.border,
+  },
+  valueCard: {
+    marginTop: spacing.md,
+    backgroundColor: 'rgba(34, 211, 238, 0.08)',
+    borderRadius: radius.lg,
+    padding: spacing.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(34, 211, 238, 0.28)',
+  },
+  valueEyebrow: {
+    fontSize: 12,
+    fontFamily: fonts.bodyStrong,
+    color: colors.textMuted,
+    textTransform: 'uppercase',
+    letterSpacing: 1.1,
+  },
+  valueTitle: {
+    marginTop: 6,
+    fontSize: 16,
+    lineHeight: 20,
+    fontFamily: fonts.headingStrong,
+    color: colors.text,
+  },
+  valueBody: {
+    marginTop: 8,
+    fontSize: 13,
+    lineHeight: 18,
+    fontFamily: fonts.body,
+    color: colors.text,
+  },
+  valueActions: {
+    marginTop: spacing.md,
+    flexDirection: 'row',
+    gap: spacing.sm,
+    flexWrap: 'wrap',
+  },
+  valueBtn: {
+    height: 44,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    paddingHorizontal: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  valueBtnPrimary: {
+    backgroundColor: colors.accentAlt,
+    borderColor: colors.accent,
+  },
+  valueBtnSecondary: {
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+  },
+  valueBtnTextPrimary: {
+    fontSize: 13,
+    fontFamily: fonts.bodyBold,
+    color: colors.text,
+  },
+  valueBtnTextSecondary: {
+    fontSize: 13,
+    fontFamily: fonts.bodyStrong,
+    color: colors.text,
   },
   welcome: {
     fontSize: 12,
