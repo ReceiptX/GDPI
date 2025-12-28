@@ -442,11 +442,10 @@ export default function AIQuoteAnalysisScreen({ user, navigation, entryMode = 'c
           <Text style={styles.label}>Quote Text {entryMode === 'paste' ? '*' : '(optional)'}</Text>
 
           <View style={styles.warningCard}>
-            <Text style={styles.warningTitle}>Quick red-flag check (before you upload)</Text>
-            <Text style={styles.warningItem}>• Vague “lifetime warranty” bundles with no itemization</Text>
-            <Text style={styles.warningItem}>• Pushing a full door replacement without clear damage proof</Text>
-            <Text style={styles.warningItem}>• Extreme labor markups (no parts/specs to justify it)</Text>
-            <Text style={styles.warningItem}>• Refurbished parts sold as new (ask brand/model)</Text>
+            <Text style={styles.warningTitle}>Before you call a technician (3 quick checks)</Text>
+            <Text style={styles.warningItem}>• Door won’t close: clean/align photo-eye sensors, remove obstructions, check “Lock/Vacation” on the wall button, and try again.</Text>
+            <Text style={styles.warningItem}>• Remote/opener seems dead: replace remote battery, confirm the opener has power (outlet/GFCI/breaker), and make sure the trolley is engaged (not in manual-release).</Text>
+            <Text style={styles.warningItem}>• Door is heavy/crooked/loud: stop using it—look for a broken spring or frayed cable. If anything looks broken, don’t force it; schedule a tech.</Text>
           </View>
 
           <View style={styles.ocrRow}>
@@ -485,6 +484,14 @@ export default function AIQuoteAnalysisScreen({ user, navigation, entryMode = 'c
       {entryMode !== 'paste' && (
         <>
           <Text style={styles.label}>Parts & Services {entryMode === 'manual' ? '*' : '(optional)'}</Text>
+
+          <View style={styles.warningCard}>
+            <Text style={styles.warningTitle}>Before you call a technician (3 quick checks)</Text>
+            <Text style={styles.warningItem}>• Door won’t close: clean/align photo-eye sensors, remove obstructions, check “Lock/Vacation” on the wall button, and try again.</Text>
+            <Text style={styles.warningItem}>• Remote/opener seems dead: replace remote battery, confirm the opener has power (outlet/GFCI/breaker), and make sure the trolley is engaged (not in manual-release).</Text>
+            <Text style={styles.warningItem}>• Door is heavy/crooked/loud: stop using it—look for a broken spring or frayed cable. If anything looks broken, don’t force it; schedule a tech.</Text>
+          </View>
+
           {MANUAL_PART_CATEGORIES.map((category) => (
             <View key={category.title} style={styles.partSection}>
               <Text style={styles.partSectionTitle}>{category.title}</Text>

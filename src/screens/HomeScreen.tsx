@@ -71,6 +71,11 @@ export default function HomeScreen({ navigation, user, onLogout }: HomeScreenPro
         <Text style={styles.cardBtnSub}>Paste a written quote (or snap a photo) and/or add parts + total cost for a full sanity check.</Text>
       </TouchableOpacity>
 
+      <TouchableOpacity style={styles.cardBtn} onPress={() => navigation.navigate('ManualQuoteEntry')}>
+        <Text style={styles.cardBtnTitle}>Manual Quote Entry</Text>
+        <Text style={styles.cardBtnSub}>Skip the paste step and go straight to the parts/services checklist + total cost.</Text>
+      </TouchableOpacity>
+
       <TouchableOpacity style={styles.cardBtn} onPress={() => navigation.navigate('NeighborhoodPricing')}>
         <Text style={styles.cardBtnTitle}>Neighborhood Pricing</Text>
         <Text style={styles.cardBtnSub}>See min/avg/max pricing from your HOA's history.</Text>
@@ -92,11 +97,10 @@ export default function HomeScreen({ navigation, user, onLogout }: HomeScreenPro
       </View>
 
       <View style={styles.warningCard}>
-        <Text style={styles.warningTitle}>Common hustle tactics</Text>
-        <Text style={styles.warningItem}>• Vague “lifetime” warranty bundles</Text>
-        <Text style={styles.warningItem}>• Unnecessary full door replacement</Text>
-        <Text style={styles.warningItem}>• Extreme labor markups</Text>
-        <Text style={styles.warningItem}>• Refurbished parts sold as new</Text>
+        <Text style={styles.warningTitle}>Before you call a technician (3 quick checks)</Text>
+        <Text style={styles.warningItem}>• Door won’t close: clean/align photo-eye sensors, remove obstructions, check “Lock/Vacation” on the wall button, and try again.</Text>
+        <Text style={styles.warningItem}>• Remote/opener seems dead: replace remote battery, confirm the opener has power (outlet/GFCI/breaker), and make sure the trolley is engaged (not in manual-release).</Text>
+        <Text style={styles.warningItem}>• Door is heavy/crooked/loud: stop using it—look for a broken spring or frayed cable. If anything looks broken, don’t force it; schedule a tech.</Text>
       </View>
 
       <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
