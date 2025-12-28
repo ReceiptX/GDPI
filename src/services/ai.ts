@@ -1,4 +1,5 @@
 import { AIAnalysisResult, QuoteVerdict, JobTiming, BaselinePricing } from '../types';
+import { evaluateTorsionSpringPricing, extractLikelyTotalAmount } from '../utils/torsionHeuristics';
 
 // Arizona baseline pricing reference
 const ARIZONA_BASELINE: BaselinePricing = {
@@ -28,7 +29,7 @@ export class AIService {
   ): Promise<AIAnalysisResult> {
     if (!this.apiKey || this.apiKey === 'your_groq_api_key_here') {
       // Return mock analysis if no API key
-      return this.getMockAnalysis(quoteText, timing);
+      return this.getMockAnalysis(quoteText, timing, doorSetup);
     }
 
     try {
@@ -65,12 +66,13 @@ export class AIService {
 
       const data = await response.json();
       const content = data.choices[0]?.message?.content || '';
-      
-      return this.parseAIResponse(content, timing);
+
+      const parsed = this.parseAIResponse(content, timing);
+      return this.applyHeuristics(parsed, quoteText, timing, doorSetup);
     } catch (error) {
       console.error('Error analyzing quote with AI:', error);
       // Fallback to mock analysis
-      return this.getMockAnalysis(quoteText, timing);
+      return this.getMockAnalysis(quoteText, timing, doorSetup);
     }
   }
 
@@ -102,6 +104,7 @@ Rules:
 - RED: Significantly overpriced or risky
 - Apply ${timing === 'after-hours' ? '1.4-2.0x multiplier' : 'scheduled rates'}
 - If this is springs-only work and the wire size is ≤ 0.250, scheduled pricing should generally not exceed $${ARIZONA_BASELINE.torsionSpringsMaxUpToWire250}
+- Field benchmark (standard 16×7 door): oil-tempered springs-only is a red flag over $675; springs + any other torsion-system part (cables/bearings/drums/etc.) is a red flag over $700. If after-hours, multiple doors, or high-lift/custom/special conditions are involved, treat it as “needs explanation” instead of an automatic red.
 - VENDOR_QUESTIONS must be non-confrontational. Use a curious, calm tone (e.g., start with “Can you help me understand…” / “Would you mind walking me through…”). If you flagged a red flag, include a question that asks the tech to explain it.
 - IMPORTANT: Over the baseline does NOT automatically mean a bad price if premium parts/materials justify it. When pricing is above baseline, treat it as “needs explanation” unless it’s extreme or has other red flags.
 - Premium justifications to check for (ask explicitly if relevant): oil-tempered vs water-tempered springs, wire sizes above 0.250, higher-cycle spring sets, upgraded hardware/bearing plates, nylon vs plastic rollers, better warranties.
@@ -191,10 +194,56 @@ After-Hours: ${ARIZONA_BASELINE.afterHoursMultiplier[0]}x-${ARIZONA_BASELINE.aft
     };
   }
 
-  private getMockAnalysis(quoteText: string, timing: JobTiming): AIAnalysisResult {
+  private applyHeuristics(
+    base: AIAnalysisResult,
+    inputText: string,
+    timing: JobTiming,
+    doorSetup: string
+  ): AIAnalysisResult {
+    const amount = extractLikelyTotalAmount(inputText);
+    const signal = evaluateTorsionSpringPricing(inputText, amount, { timing, doorSetup });
+
+    if (!signal.applied || !signal.verdict) return base;
+
+    const redFlags = [...(base.redFlags || [])].filter((x) => x && x.toLowerCase() !== 'none seen');
+    const vendorQuestions = [...(base.vendorQuestions || [])];
+
+    if (signal.redFlag && !redFlags.some((f) => f.toLowerCase().includes('springs') && f.toLowerCase().includes('red flag'))) {
+      redFlags.unshift(signal.redFlag);
+    }
+
+    if (signal.notes?.length) {
+      for (const note of signal.notes) {
+        const line = `Note: ${note}`;
+        if (!redFlags.some((f) => f.toLowerCase() === line.toLowerCase())) {
+          redFlags.push(line);
+        }
+      }
+    }
+
+    if (signal.vendorQuestion && !vendorQuestions.some((q) => q.toLowerCase().includes('itemized') || q.toLowerCase().includes('center bearing'))) {
+      vendorQuestions.unshift(signal.vendorQuestion);
+    }
+
+    const verdictRank: Record<QuoteVerdict, number> = { green: 0, yellow: 1, red: 2 };
+    const nextVerdict = verdictRank[signal.verdict] > verdictRank[base.verdict] ? signal.verdict : base.verdict;
+
+    const nextPriceContext = base.priceContext
+      ? `${base.priceContext} (Benchmark check applied for standard 16×7 torsion spring pricing.)`
+      : 'Benchmark check applied for standard 16×7 torsion spring pricing.';
+
+    return {
+      ...base,
+      verdict: nextVerdict,
+      priceContext: nextPriceContext,
+      redFlags: redFlags.length ? redFlags : ['None seen'],
+      vendorQuestions: vendorQuestions.slice(0, 3),
+    };
+  }
+
+  private getMockAnalysis(quoteText: string, timing: JobTiming, doorSetup?: string): AIAnalysisResult {
     // Simple mock analysis based on amount if we can extract it
-    const amountMatch = quoteText.match(/\$?(\d+(?:,\d{3})*(?:\.\d{2})?)/);
-    const amount = amountMatch ? parseFloat(amountMatch[1].replace(/,/g, '')) : 0;
+    const amount = extractLikelyTotalAmount(quoteText);
 
     const lower = quoteText.toLowerCase();
     const hasSprings = lower.includes('spring');
@@ -292,15 +341,17 @@ After-Hours: ${ARIZONA_BASELINE.afterHoursMultiplier[0]}x-${ARIZONA_BASELINE.aft
     vendorQuestions.push('Would you mind sharing the warranty details on parts and labor, in writing?');
     vendorQuestions.push('Can you confirm whether all parts are new (not refurbished), and list the brands/models?');
 
-    return {
+    const base: AIAnalysisResult = {
       verdict,
       priceContext,
       redFlags: redFlags.length > 0 ? redFlags : ['None seen'],
       vendorQuestions: vendorQuestions.slice(0, 3),
-      nextStep: verdict === 'green' 
+      nextStep: verdict === 'green'
         ? 'Price appears fair. Proceed if vendor is licensed.'
         : 'Ask the vendor questions listed above before proceeding.',
     };
+
+    return this.applyHeuristics(base, quoteText, timing, doorSetup ?? '');
   }
 
   getBaselinePricing(): BaselinePricing {

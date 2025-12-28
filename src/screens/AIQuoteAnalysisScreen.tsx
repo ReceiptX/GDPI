@@ -26,6 +26,121 @@ type DoorType = 'single' | 'double' | 'unknown';
 type DoorHeight = '7ft' | '8ft' | 'unknown';
 type DoorInsulation = 'insulated' | 'non-insulated' | 'unknown';
 
+const MANUAL_PART_CATEGORIES = [
+  {
+    title: 'Springs & counterbalance',
+    items: [
+      { key: 'torsionSprings', label: 'Torsion springs (pair)' },
+      { key: 'extensionSprings', label: 'Extension springs (pair)' },
+      { key: 'torsionConversion', label: 'Conversion to torsion system' },
+      { key: 'cableOffDrum', label: 'Cable off drum / reset & re-tension' },
+    ],
+  },
+  {
+    title: 'Torsion hardware (often bundled with springs)',
+    items: [
+      { key: 'liftCables', label: 'Lift cables' },
+      { key: 'drums', label: 'Drums' },
+      { key: 'centerBearing', label: 'Center bearing' },
+      { key: 'endBearings', label: 'End bearings' },
+      { key: 'bearingPlates', label: 'Bearing plates / end plates' },
+      { key: 'bottomBrackets', label: 'Bottom brackets' },
+    ],
+  },
+  {
+    title: 'Door hardware & track',
+    items: [
+      { key: 'rollers', label: 'Rollers' },
+      { key: 'hinges', label: 'Hinges' },
+      { key: 'topBrackets', label: 'Top brackets' },
+      { key: 'strut', label: 'Strut / reinforcement bar' },
+      { key: 'track', label: 'Track replacement' },
+      { key: 'trackHardware', label: 'Track hardware (angle, bolts, flags)' },
+      { key: 'alignment', label: 'Track/door alignment or re-hang' },
+    ],
+  },
+  {
+    title: 'Weather seals',
+    items: [
+      { key: 'weathersealBottom', label: 'Bottom seal (astragal)' },
+      { key: 'weathersealPerimeter', label: 'Perimeter seal (top/sides)' },
+    ],
+  },
+  {
+    title: 'Opener & accessories',
+    items: [
+      { key: 'opener', label: 'Opener replacement' },
+      { key: 'openerBeltChain', label: 'Belt/chain' },
+      { key: 'openerTrolley', label: 'Trolley / carriage' },
+      { key: 'openerGear', label: 'Gear & sprocket' },
+      { key: 'openerLogicBoard', label: 'Logic board' },
+      { key: 'safetySensors', label: 'Safety sensors / photo eyes' },
+      { key: 'wallButton', label: 'Wall button' },
+      { key: 'keypad', label: 'Keypad' },
+      { key: 'remotes', label: 'Remotes' },
+    ],
+  },
+  {
+    title: 'Door sections',
+    items: [
+      { key: 'panels', label: 'Panel/section replacement' },
+      { key: 'fullDoor', label: 'Full door replacement' },
+    ],
+  },
+  {
+    title: 'Service items',
+    items: [
+      { key: 'serviceCall', label: 'Service call / diagnostic fee' },
+      { key: 'tuneUp', label: 'Tune-up / maintenance' },
+      { key: 'lock', label: 'Manual lock / handle set' },
+    ],
+  },
+] as const;
+
+type ManualPartKey = (typeof MANUAL_PART_CATEGORIES)[number]['items'][number]['key'];
+
+const INITIAL_MANUAL_PARTS: Record<ManualPartKey, boolean> = {
+  torsionSprings: false,
+  extensionSprings: false,
+  torsionConversion: false,
+  cableOffDrum: false,
+
+  liftCables: false,
+  drums: false,
+  centerBearing: false,
+  endBearings: false,
+  bearingPlates: false,
+  bottomBrackets: false,
+
+  rollers: false,
+  hinges: false,
+  topBrackets: false,
+  strut: false,
+  track: false,
+  trackHardware: false,
+  alignment: false,
+
+  weathersealBottom: false,
+  weathersealPerimeter: false,
+
+  opener: false,
+  openerBeltChain: false,
+  openerTrolley: false,
+  openerGear: false,
+  openerLogicBoard: false,
+  safetySensors: false,
+  wallButton: false,
+  keypad: false,
+  remotes: false,
+
+  panels: false,
+  fullDoor: false,
+
+  serviceCall: false,
+  tuneUp: false,
+  lock: false,
+};
+
 export default function AIQuoteAnalysisScreen({ user, navigation, entryMode = 'combined' }: AIQuoteAnalysisScreenProps) {
   const [quoteText, setQuoteText] = useState('');
   const [timing, setTiming] = useState<JobTiming>('scheduled');
@@ -40,31 +155,37 @@ export default function AIQuoteAnalysisScreen({ user, navigation, entryMode = 'c
   const [ocrStatus, setOcrStatus] = useState<string>('');
   const [quotePhotoUri, setQuotePhotoUri] = useState<string | null>(null);
 
-  const [parts, setParts] = useState({
-    torsionSprings: false,
-    rollers: false,
-    hinges: false,
-    cables: false,
-    opener: false,
-    panels: false,
-    fullDoor: false,
-  });
+  const [parts, setParts] = useState<Record<ManualPartKey, boolean>>({ ...INITIAL_MANUAL_PARTS });
   const [otherParts, setOtherParts] = useState('');
   const [totalCost, setTotalCost] = useState('');
   const [notes, setNotes] = useState('');
 
-  const togglePart = (part: keyof typeof parts) => {
+  const togglePart = (part: ManualPartKey) => {
     setParts({ ...parts, [part]: !parts[part] });
   };
 
   const getManualJobType = (): string => {
-    if (parts.fullDoor) return 'Full door replacement';
-    if (parts.opener) return 'Opener replacement';
-    if (parts.torsionSprings) return 'Torsion springs';
-    if (parts.panels) return 'Panel replacement';
-    if (parts.rollers) return 'Rollers';
-    const anyOther = otherParts.trim().length > 0;
-    return anyOther ? 'General service' : 'General service';
+    const priority: Array<[ManualPartKey, string]> = [
+      ['fullDoor', 'Full door replacement'],
+      ['panels', 'Panel/section replacement'],
+      ['opener', 'Opener replacement'],
+      ['torsionConversion', 'Torsion conversion'],
+      ['torsionSprings', 'Torsion springs'],
+      ['extensionSprings', 'Extension springs'],
+      ['liftCables', 'Lift cables'],
+      ['cableOffDrum', 'Cable off drum / reset'],
+      ['track', 'Track replacement'],
+      ['rollers', 'Rollers'],
+      ['weathersealBottom', 'Weather seal'],
+      ['tuneUp', 'Tune-up'],
+      ['serviceCall', 'Service call'],
+    ];
+
+    for (const [k, label] of priority) {
+      if (parts[k]) return label;
+    }
+
+    return otherParts.trim().length > 0 ? 'General service' : 'General service';
   };
 
   const buildManualSummaryText = (): string => {
@@ -74,13 +195,15 @@ export default function AIQuoteAnalysisScreen({ user, navigation, entryMode = 'c
     let text = 'MANUAL ENTRY (homeowner-provided)\n';
     text += 'Parts & Services:\n';
 
-    if (parts.torsionSprings) text += '- Torsion Springs (pair)\n';
-    if (parts.rollers) text += '- Rollers replacement\n';
-    if (parts.hinges) text += '- Hinges replacement\n';
-    if (parts.cables) text += '- Cables replacement\n';
-    if (parts.opener) text += '- Opener replacement\n';
-    if (parts.panels) text += '- Panel replacement\n';
-    if (parts.fullDoor) text += '- Full door replacement\n';
+    for (const category of MANUAL_PART_CATEGORIES) {
+      const selected = category.items.filter((it) => parts[it.key]);
+      if (selected.length === 0) continue;
+      text += `${category.title}:\n`;
+      for (const item of selected) {
+        text += `- ${item.label}\n`;
+      }
+    }
+
     if (anyOther) text += `- ${otherParts.trim()}\n`;
     if (!anySelected && !anyOther) text += '- (none selected)\n';
 
@@ -362,32 +485,31 @@ export default function AIQuoteAnalysisScreen({ user, navigation, entryMode = 'c
       {entryMode !== 'paste' && (
         <>
           <Text style={styles.label}>Parts & Services {entryMode === 'manual' ? '*' : '(optional)'}</Text>
-          <View style={styles.checkboxGroup}>
-            {([
-              { key: 'torsionSprings', label: 'Torsion Springs (pair)' },
-              { key: 'rollers', label: 'Rollers' },
-              { key: 'hinges', label: 'Hinges' },
-              { key: 'cables', label: 'Cables' },
-              { key: 'opener', label: 'Opener' },
-              { key: 'panels', label: 'Panels' },
-              { key: 'fullDoor', label: 'Full Door Replacement' },
-            ] as const).map((item) => (
-              <TouchableOpacity
-                key={item.key}
-                style={styles.checkbox}
-                onPress={() => togglePart(item.key)}
-              >
-                <View style={[styles.checkboxBox, parts[item.key] && styles.checkboxBoxChecked]}>
-                  {parts[item.key] && <Text style={styles.checkboxCheck}>✓</Text>}
-                </View>
-                <Text style={styles.checkboxLabel}>{item.label}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          {MANUAL_PART_CATEGORIES.map((category) => (
+            <View key={category.title} style={styles.partSection}>
+              <Text style={styles.partSectionTitle}>{category.title}</Text>
+              <View style={styles.checkboxGroup}>
+                {category.items.map((item) => (
+                  <TouchableOpacity key={item.key} style={styles.checkbox} onPress={() => togglePart(item.key)}>
+                    <View style={[styles.checkboxBox, parts[item.key] && styles.checkboxBoxChecked]}>
+                      {parts[item.key] && <Text style={styles.checkboxCheck}>✓</Text>}
+                    </View>
+                    <Text style={styles.checkboxLabel}>{item.label}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          ))}
 
           {parts.torsionSprings && (
             <Text style={styles.hint}>
-              Springs-only benchmark: if the wire size is ≤ 0.250, scheduled pricing generally shouldn’t exceed ~$600. If it’s higher, ask what makes it premium (spring type/cycle rating/wire size) and what’s included.
+              Springs benchmark: if the wire size is ≤ 0.250, scheduled springs-only pricing commonly shouldn’t exceed ~$600. If it’s higher, ask what makes it premium (spring type/cycle rating/wire size) and what’s included.
+            </Text>
+          )}
+
+          {(parts.torsionSprings || parts.extensionSprings || parts.torsionConversion) && (
+            <Text style={styles.hint}>
+              Tip: If the quote lists center bearing/end bearings/drums as separate line items, ask whether those are actually needed and whether any of them are normally included with the spring job.
             </Text>
           )}
 
@@ -721,6 +843,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     padding: spacing.sm,
+  },
+  partSection: {
+    marginTop: spacing.sm,
+  },
+  partSectionTitle: {
+    marginBottom: 8,
+    fontSize: 12,
+    fontFamily: fonts.headingStrong,
+    color: colors.textMuted,
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
   },
   checkbox: {
     flexDirection: 'row',

@@ -54,3 +54,7 @@ yarn-error.log*
 
 # Local Netlify folder
 .netlify
+
+# Neon local project config (may include connection details)
+.neon/
+.neon
