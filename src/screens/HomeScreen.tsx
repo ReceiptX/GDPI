@@ -22,8 +22,18 @@ export default function HomeScreen({ navigation, user, onLogout }: HomeScreenPro
         text: 'Logout',
         style: 'destructive',
         onPress: async () => {
-          await StorageService.clearCurrentUser();
-          onLogout();
+          try {
+            await StorageService.clearCurrentUser();
+          } catch (err) {
+            console.error('Logout: failed to clear current user from storage:', err);
+            // Still log out in-memory so the user isn't stuck.
+            Alert.alert(
+              'Logged out (local data not fully cleared)',
+              'We logged you out, but your browser/device may have kept some cached data. If you see this again, refresh the page or clear site data.'
+            );
+          } finally {
+            onLogout();
+          }
         },
       },
     ]);
